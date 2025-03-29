@@ -1,4 +1,9 @@
 const BloodDonation = require("../models/BloodDonation");
+const RecipientBloodRequest = require("../models/RecipientBloodRequest");
+const sendNotification = require("../utils/sendNotification");
+const emitEvent = require('../socket/emitEvent')
+
+
 
 
 exports.createBloodDonation = async (req, res) => {
@@ -25,6 +30,12 @@ exports.createBloodDonation = async (req, res) => {
     });
 
     await bloodDonation.save();
+    
+    emitEvent(req.io, {roles:["recipient"]}, "updateBloodDonations", bloodDonation);
+    const bloodDonations = await BloodDonation.countDocuments({ status: 'completed' });
+    emitEvent(req.io, "all", "updateStats", { bloodDonations });
+
+
     res.status(201).json({ message: "Blood donation request submitted", bloodDonation });
   } catch (err) {
     res.status(500).json({ message: "Failed to submit request", error: err.message });
@@ -38,26 +49,43 @@ exports.createBloodDonation = async (req, res) => {
  */
 exports.requestBlood = async (req, res) => {
   try {
-    const { bloodGroup } = req.body;
+    const { bloodDonationId, urgencyLevel, message } = req.body;
 
-    if (!bloodGroup) {
-      return res.status(400).json({ message: "Blood group is required" });
+    // ✅ Ensure required fields are provided
+    if (!bloodDonationId || !urgencyLevel) {
+      return res.status(400).json({ message: "Blood donation ID and urgency level are required" });
     }
 
     if (req.user.role !== "recipient") {
       return res.status(403).json({ message: "Only recipients can request blood" });
     }
 
-    const bloodRequest = new BloodDonation({
+    const bloodRequest = new RecipientBloodRequest({
+      bloodDonation: bloodDonationId,
       recipient: req.user.id,
-      bloodGroup,
+      urgencyLevel,
       status: "pending",
+      message: message || "",  // Optional message
     });
 
     await bloodRequest.save();
-    res.status(201).json({ message: "Blood request submitted", bloodRequest });
+
+    req.io.emit("newBloodRequest", { bloodRequest });
+
+    await sendNotification(
+      {
+        target: "donor",
+        excludeUser: req.user.id
+      },
+      
+      "New Blood Request Created",
+      "A new blood donation request has been submitted. Please review.",
+      req.io
+    );
+
+    res.status(201).json({ message: "Blood request submitted successfully", bloodRequest });
   } catch (err) {
-    res.status(500).json({ message: "Failed to submit request", error: err.message });
+    res.status(500).json({ message: "Failed to submit blood request", error: err.message });
   }
 };
 
@@ -68,6 +96,19 @@ exports.getAllBloodDonations = async (req, res) => {
     res.json(bloodDonations);
   } catch (err) {
     res.status(500).json({ message: "Failed to retrieve blood donations", error: err.message });
+  }
+};
+
+
+exports.getAvailableBloodDonations = async (req, res) => {
+  try {
+    const availableBloodDonations = await BloodDonation.find({ status: "approved" }).populate("donor", "fullName email");
+    res.json(availableBloodDonations);
+  } catch (err) {
+    res.status(500).json({ 
+      message: "Failed to retrieve available blood donations", 
+      error: err.message 
+    });
   }
 };
 
@@ -154,10 +195,8 @@ exports.deleteBloodDonation = async (req, res) => {
 
     await bloodDonation.deleteOne();
 
-    // ✅ Emit real-time event
     req.io.emit("bloodDonationDeleted", { donationId });
 
-    // ✅ Send notification to the donor
     await sendNotification(req.io, bloodDonation.donor, "Your blood donation has been deleted.");
 
     res.json({ message: "Blood donation deleted successfully" });

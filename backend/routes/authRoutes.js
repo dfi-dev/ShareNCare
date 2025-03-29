@@ -1,9 +1,20 @@
 const express = require("express");
-const { signup, login } = require("../controllers/authController");
+const { signup, login, forgotPassword, resetPassword, confirmEmail } = require("../controllers/authController");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware")
 
+// Signup
 router.post("/signup", signup);
+
+// Login
 router.post("/login", login);
+
+// Forgot Password (Send Reset Link)
+router.post("/forgot-password", forgotPassword);
+
+// Reset Password (Using Token)
+router.post("/reset-password/:token", resetPassword);
+
+// Confirm Signup
+router.get("/confirm-email", confirmEmail);
 
 module.exports = router;

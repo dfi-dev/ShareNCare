@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const bloodDonationSchema = new mongoose.Schema(
   {
-    donor: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    donor: { type: mongoose.Schema.Types.Mixed, ref: "User", required: true },
     recipient: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     bloodGroup: { 
       type: String, 
@@ -14,11 +14,15 @@ const bloodDonationSchema = new mongoose.Schema(
     medicalConditions: { type: String, default: "" },
     recentSurgeries: { type: String, default: "" }, 
     consent: { type: Boolean, required: true },
-    status: { type: String, enum: ["pending", "completed"], default: "pending" }
+    status: { 
+      type: String, 
+      enum: ["pending", "approved", "completed"], 
+      default: "pending"
+    }
   },
   { timestamps: true }
 );
-
+ 
 const BloodDonation = mongoose.models.BloodDonation || mongoose.model("BloodDonation", bloodDonationSchema);
 
 module.exports = BloodDonation;

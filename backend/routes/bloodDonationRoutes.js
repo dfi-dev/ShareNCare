@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const { createBloodDonation, requestBlood, getAllBloodDonations, getUserBloodDonations, updateBloodDonation,updateBloodDonationStatus, deleteBloodDonation, getBloodRequests } = require("../controllers/bloodDonationController");
+const { createBloodDonation, requestBlood, getAllBloodDonations, getAvailableBloodDonations, getUserBloodDonations, updateBloodDonation,updateBloodDonationStatus, deleteBloodDonation, getBloodRequests } = require("../controllers/bloodDonationController");
 
 // Donor donates blood
 router.post("/donate", authMiddleware, createBloodDonation);
@@ -18,6 +18,9 @@ router.get("/my-blood-donations", authMiddleware, getUserBloodDonations);
 // Get all blood requests (Admin)
 router.get("/requests", authMiddleware, getBloodRequests);
 
+// Fetch approved donations (only for recipients)
+router.get("/available", authMiddleware, getAvailableBloodDonations);
+
 // Update blood donation status (Admin Only)
 router.patch("/:donationId/status", authMiddleware, updateBloodDonationStatus);
 
@@ -26,6 +29,5 @@ router.put("/:donationId", authMiddleware, updateBloodDonation);
 
 // Delete blood donation (Donor Only)
 router.delete("/:donationId", authMiddleware, deleteBloodDonation);
-
 
 module.exports = router;

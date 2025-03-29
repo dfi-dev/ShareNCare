@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
-const { createDonation, requestDonation, getAllDonations, updateDonation,deleteDonation, updateDonationStatus, getUserDonations, getDonationRequests } = require("../controllers/donationController");
+const { createDonation, requestDonation, getAllDonations, getAvailableDonations, updateDonation,deleteDonation, updateDonationStatus, getUserDonations, getDonationRequests } = require("../controllers/donationController");
 
 // Donor donates general items
 router.post("/donate", authMiddleware, createDonation);
@@ -17,6 +17,9 @@ router.get("/my-donations", authMiddleware, getUserDonations);
 
 // Get all general donation requests (Admin)
 router.get("/requests", authMiddleware, getDonationRequests);
+
+// Fetch approved donations (only for recipients)
+router.get("/available", authMiddleware, getAvailableDonations);
 
 // Update donation status (Admin or authorized users)
 router.patch("/:donationId/status", authMiddleware, updateDonationStatus);
