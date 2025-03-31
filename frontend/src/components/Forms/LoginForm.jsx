@@ -35,10 +35,10 @@ const LoginForm = ({setFormData, onSubmit, isPasswordCorrect, formData}) => {
     return (
         <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
             <InputField
-                name="username"
-                value={formData.username}
+                name="email"
+                value={formData.email}
                 type="text"
-                placeholder="Username"
+                placeholder="Email"
                 icon={<FaAt/>}
                 onChange={handleChange}
                 shouldValidate={false}

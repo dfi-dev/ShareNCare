@@ -1,24 +1,24 @@
 'use client'
-
 import { useState } from 'react'
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, BellIcon } from '@heroicons/react/24/outline'
 import { HiMiniBellAlert } from "react-icons/hi2";
+import { Link } from 'react-router-dom';
 
 const navigation = [
-  { name: 'Home', href: '#' },
-  { name: 'Donate', href: '#' },
-  { name: 'About', href: '#' },
-  { name: 'Contact', href: '#' },
-  { name: 'Top Donors', href: '#' }
+  { name: 'Home', path: '/' },
+  { name: 'Donate', path: '/donate' },
+  { name: 'About', path: '/about' },
+  { name: 'Contact', path: '/contact' },
+  { name: 'Top Donors', path: '/top-donors' }
 ]
 
 export default function Header() {
-    const notificationCount = 5;
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
-    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-    const [notificationOpen, setNotificationOpen] = useState(false);
+  const notificationCount = 5;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
 
   // Toggle profile menu and ensure notification popup is closed
   const toggleProfileMenu = () => {
@@ -38,10 +38,13 @@ export default function Header() {
         <nav className="flex items-center justify-between p-6 lg:px-8">
           {/* Logo */}
           <div className="flex lg:flex-1">
-            <a href="#" className="-m-1.5 p-1.5">
+            <Link to="/" className="-m-1.5 p-1.5 cursor-pointer">
               <span className="sr-only">Your Company</span>
-              <img alt="Logo" src='./defacto-logo.png' className="h-8 w-auto" />
-            </a>
+              <img
+                alt="Logo"
+                src="https://res.cloudinary.com/dcsiml3nf/image/upload/v1743251027/donate2serve-logo-black_oebyxf.png"
+                className="w-[250px] h-auto" />
+            </Link>
           </div>
 
           {/* Mobile Menu AnimatedButton */}
@@ -49,7 +52,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 cursor-pointer"
             >
               <span className="sr-only">Open main menu</span>
               <Bars3Icon className="size-6" aria-hidden="true" />
@@ -59,9 +62,13 @@ export default function Header() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
-              <a key={item.name} href={item.href} className="text-sm font-semibold text-gray-900">
+              <Link
+                key={item.name}
+                to={item.path}
+                className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition cursor-pointer"
+              >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -71,23 +78,28 @@ export default function Header() {
               <>
                 {/* Notification AnimatedButton */}
                 <button
-                    onClick={toggleNotifications}
-                    className="relative p-2 rounded-full text-gray-700  focus:outline-none focus:ring-2 focus:ring-white"
+                  onClick={toggleNotifications}
+                  className="relative p-2 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-white cursor-pointer"
                 >
                   <span className="sr-only">View notifications</span>
-                    {notificationCount > 0 ? (<><HiMiniBellAlert  className="size-6"/>
-                        <span className="absolute top-[-5px] right-[7px] bg-[rgb(249,30,30)] text-white text-[9px] font-bold w-[14px] h-[14px] flex items-center justify-center rounded-full">
+                  {notificationCount > 0 ? (
+                    <>
+                      <HiMiniBellAlert className="size-6" />
+                      <span className="absolute top-[-5px] right-[7px] bg-[rgb(249,30,30)] text-white text-[9px] font-bold w-[14px] h-[14px] flex items-center justify-center rounded-full">
                         {notificationCount}
-                    </span></>)
-                        : <BellIcon className="size-6"/>}
-
+                      </span>
+                    </>
+                  ) : (
+                    <BellIcon className="size-6" />
+                  )}
                 </button>
-
 
                 {/* Notification Popup */}
                 {notificationOpen && (
                   <div className="absolute right-4 top-20 w-64 bg-white shadow-lg rounded-md p-4">
-                    <p className="text-gray-700 text-center">{notificationCount >0 ? "🔔 You have a new notification!" : "🔕 No new Notification!"}</p>
+                    <p className="text-gray-700 text-center">
+                      {notificationCount > 0 ? "🔔 You have new notifications!" : "🔕 No new notifications!"}
+                    </p>
                   </div>
                 )}
 
@@ -96,7 +108,7 @@ export default function Header() {
                   <button
                     type="button"
                     onClick={toggleProfileMenu}
-                    className="relative flex rounded-full bg-gray-200 p-1.5 focus:outline-none"
+                    className="relative flex rounded-full bg-gray-200 p-1.5 focus:outline-none cursor-pointer"
                   >
                     <span className="sr-only">Open user menu</span>
                     <img
@@ -109,15 +121,15 @@ export default function Header() {
                   {/* Dropdown Menu */}
                   {profileMenuOpen && (
                     <div className="absolute right-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                         Your Profile
-                      </a>
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      </Link>
+                      <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                         Settings
-                      </a>
+                      </Link>
                       <button
                         onClick={() => setIsLoggedIn(false)}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                       >
                         Sign out
                       </button>
@@ -126,9 +138,9 @@ export default function Header() {
                 </div>
               </>
             ) : (
-              <a href="#" className="text-sm font-semibold text-gray-900">
+              <Link to="/login" className="text-sm font-semibold text-gray-900 cursor-pointer">
                 Log in <span aria-hidden="true">&rarr;</span>
-              </a>
+              </Link>
             )}
           </div>
         </nav>
@@ -138,18 +150,14 @@ export default function Header() {
           <div className="fixed inset-0 z-50" />
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
-              <a href="#" className="-m-1.5 p-1.5">
+              <Link to="/" className="-m-1.5 p-1.5 cursor-pointer">
                 <span className="sr-only">Your Company</span>
-                <img
-                  alt="Logo"
-                  src="./defacto-logo.png"
-                  className="h-8 w-auto"
-                />
-              </a>
+                <img alt="Logo" src="./defacto-logo.png" className="h-8 w-auto" />
+              </Link>
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="-m-2.5 rounded-md p-2.5 text-gray-700"
+                className="-m-2.5 rounded-md p-2.5 text-gray-700 cursor-pointer"
               >
                 <span className="sr-only">Close menu</span>
                 <XMarkIcon className="size-6" aria-hidden="true" />
@@ -157,35 +165,11 @@ export default function Header() {
             </div>
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-gray-500/10">
-                <div className="space-y-2 py-6">
-                  {navigation.map((item) => (
-                    <a key={item.name} href={item.href} className="block px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">
-                      {item.name}
-                    </a>
-                  ))}
-                </div>
-                <div className="py-6">
-                  {isLoggedIn ? (
-                    <>
-                      <button className="block w-full text-left px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">
-                        Your Profile
-                      </button>
-                      <button className="block w-full text-left px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">
-                        Settings
-                      </button>
-                      <button
-                        onClick={() => setIsLoggedIn(false)}
-                        className="block w-full text-left px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50"
-                      >
-                        Sign out
-                      </button>
-                    </>
-                  ) : (
-                    <a href="#" className="block px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50">
-                      Log in
-                    </a>
-                  )}
-                </div>
+                {navigation.map((item) => (
+                  <Link key={item.name} to={item.path} className="block px-3 py-2 text-base font-semibold text-gray-900 hover:bg-gray-50 cursor-pointer">
+                    {item.name}
+                  </Link>
+                ))}
               </div>
             </div>
           </DialogPanel>

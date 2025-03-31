@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart, Calendar, Droplet, CheckCircle2, Smile, Handshake, Users, Hand } from "lucide-react";
+import { Heart, Calendar, Droplet, CheckCircle2, Smile, Handshake, Users } from "lucide-react";
 
 const DonorDashboard = () => {
   const OptionCard = ({ title, description, icon: Icon, onClick }) => (
@@ -25,11 +25,9 @@ const DonorDashboard = () => {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
-        <div className="flex items-center gap-2">
-          <Hand size={18} className="text-blue-500" />
-          <p className="text-sm text-gray-500">Welcome! <strong>Sunny</strong> </p>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold">Your Impact Matters 🌟</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
+          🌟 Thank You for Being a Lifesaver! 🙌
+        </h1>
         <button className="flex items-center gap-3 px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition shadow-md">
           <Droplet size={18} />
           <span className="text-sm">New Donation</span>
