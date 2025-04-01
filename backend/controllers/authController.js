@@ -5,6 +5,8 @@ const { generateJWTToken, generatePasswordResetToken } = require("../utils/token
 const sendEmail = require("../utils/sendEmail");
 const getEmailTemplate = require("../templates/emailTemplate");
 const emailContent = require("../templates/emailContent");
+const jwt = require('jsonwebtoken');
+
 
 
 // Signup
