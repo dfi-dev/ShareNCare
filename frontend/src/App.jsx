@@ -1,100 +1,47 @@
-import { motion } from "framer-motion";
-import { Heart, Calendar, Droplet, CheckCircle2, Smile, Handshake, Users, Hand } from "lucide-react";
+import { Routes, Route, useLocation } from 'react-router-dom';
+import Footer from "./components/Layout/Footer.jsx";
+import Header from "./components/Layout/Header.jsx";
+import Notifications from "./components/Notifications/Notifications.jsx";
+import Welcome from "./pages/Welcome.jsx";
+import About from "./pages/About.jsx";
+import Contact from "./pages/Contact.jsx";
+import TopDonors from "./pages/TopDonors.jsx";
+import Donate from "./pages/Donate.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import ConfirmEmailPage from './pages/ConfirmEmailPage.jsx';
 
-const DonorDashboard = () => {
-  const OptionCard = ({ title, description, icon: Icon, onClick }) => (
-    <motion.div
-      whileHover={{ scale: 1.05, boxShadow: "0 12px 25px rgba(0,0,0,0.1)" }}
-      className="w-full min-h-[140px] max-h-[140px] bg-white rounded-lg shadow-md border transition cursor-pointer group hover:shadow-lg flex justify-between items-center"
-      onClick={onClick}
-    >
-      <div className="flex items-center gap-4 px-6 py-4 w-full">
-        <div className="p-2 rounded-lg bg-blue-50 group-hover:bg-blue-100 transition">
-          <Icon size={28} className="text-blue-500" />
+const App = () => {
+    const location = useLocation();
+
+    // Hide header and footer on login, signup, and OTP pages
+    const hideHeaderFooter = ['/login', '/signup', '/otp'].includes(location.pathname);
+
+    return (
+        <div className="min-h-screen flex flex-col">
+            {!hideHeaderFooter && <Header />}
+
+            <main className="flex-grow">
+                <Routes>
+                    <Route path="/" element={<Welcome />} /> 
+                    <Route path="/donate" element={<Donate />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/top-donors" element={<TopDonors />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+
+                    {/* 404 Not Found Route */}
+                    <Route path="*" element={<div className="text-center py-10 text-red-500">404 - Page Not Found</div>} />
+                </Routes>
+            </main>
+
+            {!hideHeaderFooter && <Footer />}
         </div>
-        <div className="w-full">
-          <h2 className="text-base font-semibold text-gray-800">{title}</h2>
-          <p className="text-sm text-gray-600">{description}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-12 text-gray-900">
-
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
-        <div className="flex items-center gap-2">
-          <Hand size={18} className="text-blue-500" />
-          <p className="text-sm text-gray-500">Welcome! <strong>Sunny</strong> </p>
-        </div>
-        <h1 className="text-3xl md:text-4xl font-bold">Your Impact Matters 🌟</h1>
-        <button className="flex items-center gap-3 px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition shadow-md">
-          <Droplet size={18} />
-          <span className="text-sm">New Donation</span>
-        </button>
-      </div>
-
-      {/* Options Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <OptionCard
-          title="Make a Donation"
-          description="Donate essentials or blood to help others."
-          icon={Heart}
-          onClick={() => alert("Navigate to donation form")}
-        />
-
-        <OptionCard
-          title="Upcoming Drives"
-          description="Explore and join upcoming donation events."
-          icon={Calendar}
-          onClick={() => alert("View upcoming drives")}
-        />
-
-        <OptionCard
-          title="My Donations"
-          description="Track your past donations and contributions."
-          icon={CheckCircle2}
-          onClick={() => alert("View donation history")}
-        />
-
-        <OptionCard
-          title="Request Help"
-          description="Ask for blood or essentials when in need."
-          icon={Handshake}
-          onClick={() => alert("Create a help request")}
-        />
-
-        <OptionCard
-          title="My Impact"
-          description="See the difference you've made by donating."
-          icon={Smile}
-          onClick={() => alert("View impact summary")}
-        />
-
-        <OptionCard
-          title="Invite Friends"
-          description="Spread the word and invite friends to donate."
-          icon={Users}
-          onClick={() => alert("Invite friends")}
-        />
-      </div>
-
-      {/* CTA Section */}
-      <div className="mt-16 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold">Make a Difference 🌟</h2>
-        <p className="text-md md:text-lg text-gray-600 mt-2">
-          Your donations save lives. Join more drives.
-        </p>
-        <button className="mt-6 px-6 py-3 rounded-md bg-green-500 text-white hover:bg-green-600 transition shadow-md">
-          <Droplet size={18} className="inline-block mr-2" />
-          <span className="text-sm">Join a Drive</span>
-        </button>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default DonorDashboard;
+export default App;

@@ -21,7 +21,7 @@ const DonorDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-12 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-6 my-10 md:p-12 text-gray-900">
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
