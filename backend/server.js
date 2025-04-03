@@ -1,11 +1,12 @@
+require("dotenv").config();
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const connectDB = require("./config/db");
+require("./config/passport");
 
-dotenv.config();
 connectDB();
 
 const app = express();

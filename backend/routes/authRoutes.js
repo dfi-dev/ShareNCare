@@ -1,5 +1,6 @@
 const express = require("express");
-const { signup, login, forgotPassword, resetPassword, confirmEmail } = require("../controllers/authController");
+const passport = require("passport");
+const { signup, login, forgotPassword, resetPassword, confirmEmail, googleAuth, googleAuthCallback} = require("../controllers/authController");
 const router = express.Router();
 
 // Signup
@@ -15,6 +16,16 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
 // Confirm Signup
-router.get("/confirm-email", confirmEmail);
+router.post("/confirm-email", confirmEmail);
+
+// Google OAuth login
+router.get("/google", googleAuth);
+
+// Google OAuth callback
+router.get(
+    "/google/callback",
+    passport.authenticate("google", { session: false }),
+    googleAuthCallback
+  );
 
 module.exports = router;

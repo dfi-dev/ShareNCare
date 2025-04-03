@@ -23,17 +23,6 @@ const DonorDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-6 my-10 md:p-12 text-gray-900">
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-center md:text-left">
-          🌟 Thank You for Being a Lifesaver! 🙌
-        </h1>
-        <button className="flex items-center gap-3 px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition shadow-md">
-          <Droplet size={18} />
-          <span className="text-sm">New Donation</span>
-        </button>
-      </div>
-
       {/* Options Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         

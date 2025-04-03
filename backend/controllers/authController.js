@@ -6,6 +6,7 @@ const sendEmail = require("../utils/sendEmail");
 const getEmailTemplate = require("../templates/emailTemplate");
 const emailContent = require("../templates/emailContent");
 const jwt = require('jsonwebtoken');
+const passport = require("passport");
 
 
 
@@ -181,8 +182,8 @@ exports.resetPassword = async (req, res) => {
 
 
 exports.confirmEmail = async (req, res) => {
-  const { token } = req.query;
-
+  const { token } = req.body;
+  
   if (!token) {
     return res.status(400).json({ message: "Invalid or missing token" });
   }
@@ -209,5 +210,34 @@ exports.confirmEmail = async (req, res) => {
   } catch (error) {
     console.error("Email confirmation error:", error);
     res.status(500).json({ message: "Invalid or expired token" });
+  }
+};
+
+// Google OAuth Redirect (handled by Passport)
+exports.googleAuth = (req, res, next) => {
+  passport.authenticate("google", { scope: ["profile", "email"] })(req, res, next);
+};
+
+// Google OAuth Callback
+exports.googleAuthCallback = async (req, res) => {
+  try {
+      const user = req.user; // Retrieved from Passport authentication
+
+      if (!user) {
+          return res.status(401).json({ message: "Google authentication failed" });
+      }
+
+      // Generate a JWT token
+      const token = generateJWTToken({ userId: user._id, fullName: user.fullName });
+
+      res.status(200).json({
+          message: "Google login successful",
+          token,
+          user: userDTO(user),
+      });
+
+  } catch (error) {
+      console.error("Google login error:", error);
+      res.status(500).json({ message: "Internal server error" });
   }
 };

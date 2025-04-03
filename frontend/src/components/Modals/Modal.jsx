@@ -10,7 +10,7 @@ const Modal = ({ type = "error", message = "Something went wrong!", onClose }) =
     useEffect(() => {
         const closeTimer = setTimeout(() => {
             onClose();
-        }, 4000);
+        }, 6000);
 
         return () => {
             clearTimeout(closeTimer);
