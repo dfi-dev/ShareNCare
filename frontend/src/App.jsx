@@ -1,7 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Footer from "./components/Layout/Footer.jsx";
 import Header from "./components/Layout/Header.jsx";
-import Notifications from "./components/Notifications/Notifications.jsx";
 import Welcome from "./pages/Welcome.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
@@ -11,6 +10,8 @@ import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ConfirmEmailPage from './pages/ConfirmEmailPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import OTPPage from './pages/OTPPage.jsx';
 
 const App = () => {
     const location = useLocation();
@@ -33,9 +34,10 @@ const App = () => {
                     <Route path="/signup" element={<SignupPage />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+                    <Route path="/otp" element={<OTPPage />} />
 
                     {/* 404 Not Found Route */}
-                    <Route path="*" element={<div className="text-center py-10 text-red-500">404 - Page Not Found</div>} />
+                    <Route path="*" element={<NotFoundPage/>} />
                 </Routes>
             </main>
 

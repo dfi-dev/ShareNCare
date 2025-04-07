@@ -3,137 +3,223 @@ import styled from 'styled-components';
 
 const Loader = () => {
     return (
+        // Use this fro white background bg-[#e8e8e8]
         <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md">
-        <StyledWrapper>
-            <div className="loader">
-                <svg height={0} width={0} viewBox="0 0 64 64" className="absolute">
-                    <defs className="s-xJBuHA073rTt" xmlns="http://www.w3.org/2000/svg">
-                        <linearGradient className="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2={2} x2={0} y1={62} x1={0} id="b">
-                            <stop className="s-xJBuHA073rTt" stopColor="#973BED" />
-                            <stop className="s-xJBuHA073rTt" stopColor="#007CFF" offset={1} />
-                        </linearGradient>
-                        <linearGradient className="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2={0} x2={0} y1={64} x1={0} id="c">
-                            <stop className="s-xJBuHA073rTt" stopColor="#FFC800" />
-                            <stop className="s-xJBuHA073rTt" stopColor="#F0F" offset={1} />
-                            <animateTransform repeatCount="indefinite" keySplines=".42,0,.58,1;.42,0,.58,1;.42,0,.58,1;.42,0,.58,1;.42,0,.58,1;.42,0,.58,1;.42,0,.58,1;.42,0,.58,1" keyTimes="0; 0.125; 0.25; 0.375; 0.5; 0.625; 0.75; 0.875; 1" dur="8s" values="0 32 32;-270 32 32;-270 32 32;-540 32 32;-540 32 32;-810 32 32;-810 32 32;-1080 32 32;-1080 32 32" type="rotate" attributeName="gradientTransform" />
-                        </linearGradient>
-                        <linearGradient className="s-xJBuHA073rTt" gradientUnits="userSpaceOnUse" y2={2} x2={0} y1={62} x1={0} id="d">
-                            <stop className="s-xJBuHA073rTt" stopColor="#00E0ED" />
-                            <stop className="s-xJBuHA073rTt" stopColor="#00DA72" offset={1} />
-                        </linearGradient>
-                    </defs>
+            <StyledWrapper>
+                <svg className="pl" width={240} height={240} viewBox="0 0 240 240">
+                    <circle className="pl__ring pl__ring--a" cx={120} cy={120} r={105} fill="none" stroke="#000" strokeWidth={20} strokeDasharray="0 660" strokeDashoffset={-330} strokeLinecap="round" />
+                    <circle className="pl__ring pl__ring--b" cx={120} cy={120} r={35} fill="none" stroke="#000" strokeWidth={20} strokeDasharray="0 220" strokeDashoffset={-110} strokeLinecap="round" />
+                    <circle className="pl__ring pl__ring--c" cx={85} cy={120} r={70} fill="none" stroke="#000" strokeWidth={20} strokeDasharray="0 440" strokeLinecap="round" />
+                    <circle className="pl__ring pl__ring--d" cx={155} cy={120} r={70} fill="none" stroke="#000" strokeWidth={20} strokeDasharray="0 440" strokeLinecap="round" />
                 </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64" height={64} width={64} className="inline-block">
-                    <path strokeLinejoin="round" strokeLinecap="round" strokeWidth={8} stroke="url(#b)" d="M 54.722656,3.9726563 A 2.0002,2.0002 0 0 0 54.941406,4 h 5.007813 C 58.955121,17.046124 49.099667,27.677057 36.121094,29.580078 a 2.0002,2.0002 0 0 0 -1.708985,1.978516 V 60 H 29.587891 V 31.558594 A 2.0002,2.0002 0 0 0 27.878906,29.580078 C 14.900333,27.677057 5.0448787,17.046124 4.0507812,4 H 9.28125 c 1.231666,11.63657 10.984383,20.554048 22.6875,20.734375 a 2.0002,2.0002 0 0 0 0.02344,0 c 11.806958,0.04283 21.70649,-9.003371 22.730469,-20.7617187 z" className="dash" id="y" pathLength={360} />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" style={{rotationDuration: '0ms', rotationDirection: 'normal'}} viewBox="0 0 64 64" height={64} width={64} className="inline-block">
-                    <path strokeLinejoin="round" strokeLinecap="round" strokeWidth={10} stroke="url(#c)" d="M 32 32
-        m 0 -27
-        a 27 27 0 1 1 0 54
-        a 27 27 0 1 1 0 -54" className="spin" id="o" pathLength={360} />
-                </svg>
-                <div className="w-2" />
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" style={{rotationDuration: '0ms', rotationDirection: 'normal'}} viewBox="0 0 64 64" height={64} width={64} className="inline-block">
-                    <path strokeLinejoin="round" strokeLinecap="round" strokeWidth={8} stroke="url(#d)" d="M 4,4 h 4.6230469 v 25.919922 c -0.00276,11.916203 9.8364941,21.550422 21.7500001,21.296875 11.616666,-0.240651 21.014356,-9.63894 21.253906,-21.25586 a 2.0002,2.0002 0 0 0 0,-0.04102 V 4 H 56.25 v 25.919922 c 0,14.33873 -11.581192,25.919922 -25.919922,25.919922 a 2.0002,2.0002 0 0 0 -0.0293,0 C 15.812309,56.052941 3.998433,44.409961 4,29.919922 Z" className="dash" id="u" pathLength={360} />
-                </svg>
-            </div>
-        </StyledWrapper>
+            </StyledWrapper>
         </div>
     );
 }
-
 const StyledWrapper = styled.div`
-    .absolute {
-        position: absolute;
+  .pl {
+    width: 6em;
+    height: 6em;
+  }
+
+  .pl__ring {
+    animation: ringA 2s linear infinite;
+  }
+
+  .pl__ring--a {
+    stroke: #f42f25;
+  }
+
+  .pl__ring--b {
+    animation-name: ringB;
+    stroke: #f49725;
+  }
+
+  .pl__ring--c {
+    animation-name: ringC;
+    stroke: #255ff4;
+  }
+
+  .pl__ring--d {
+    animation-name: ringD;
+    stroke: #f42582;
+  }
+
+  /* Animations */
+  @keyframes ringA {
+    from, 4% {
+      stroke-dasharray: 0 660;
+      stroke-width: 20;
+      stroke-dashoffset: -330;
     }
 
-    .inline-block {
-        display: inline-block;
+    12% {
+      stroke-dasharray: 60 600;
+      stroke-width: 30;
+      stroke-dashoffset: -335;
     }
 
-    .loader {
-        display: flex;
-        margin: 0.25em 0;
+    32% {
+      stroke-dasharray: 60 600;
+      stroke-width: 30;
+      stroke-dashoffset: -595;
     }
 
-    .w-2 {
-        width: 0.5em;
+    40%, 54% {
+      stroke-dasharray: 0 660;
+      stroke-width: 20;
+      stroke-dashoffset: -660;
     }
 
-    .dash {
-        animation: dashArray 2s ease-in-out infinite,
-        dashOffset 2s linear infinite;
+    62% {
+      stroke-dasharray: 60 600;
+      stroke-width: 30;
+      stroke-dashoffset: -665;
     }
 
-    .spin {
-        animation: spinDashArray 2s ease-in-out infinite,
-        spin 8s ease-in-out infinite,
-        dashOffset 2s linear infinite;
-        transform-origin: center;
+    82% {
+      stroke-dasharray: 60 600;
+      stroke-width: 30;
+      stroke-dashoffset: -925;
     }
 
-    @keyframes dashArray {
-        0% {
-            stroke-dasharray: 0 1 359 0;
-        }
+    90%, to {
+      stroke-dasharray: 0 660;
+      stroke-width: 20;
+      stroke-dashoffset: -990;
+    }
+  }
 
-        50% {
-            stroke-dasharray: 0 359 1 0;
-        }
-
-        100% {
-            stroke-dasharray: 359 1 0 0;
-        }
+  @keyframes ringB {
+    from, 12% {
+      stroke-dasharray: 0 220;
+      stroke-width: 20;
+      stroke-dashoffset: -110;
     }
 
-    @keyframes spinDashArray {
-        0% {
-            stroke-dasharray: 270 90;
-        }
-
-        50% {
-            stroke-dasharray: 0 360;
-        }
-
-        100% {
-            stroke-dasharray: 270 90;
-        }
+    20% {
+      stroke-dasharray: 20 200;
+      stroke-width: 30;
+      stroke-dashoffset: -115;
     }
 
-    @keyframes dashOffset {
-        0% {
-            stroke-dashoffset: 365;
-        }
-
-        100% {
-            stroke-dashoffset: 5;
-        }
+    40% {
+      stroke-dasharray: 20 200;
+      stroke-width: 30;
+      stroke-dashoffset: -195;
     }
 
-    @keyframes spin {
-        0% {
-            rotate: 0deg;
-        }
+    48%, 62% {
+      stroke-dasharray: 0 220;
+      stroke-width: 20;
+      stroke-dashoffset: -220;
+    }
 
-        12.5%,
-        25% {
-            rotate: 270deg;
-        }
+    70% {
+      stroke-dasharray: 20 200;
+      stroke-width: 30;
+      stroke-dashoffset: -225;
+    }
 
-        37.5%,
-        50% {
-            rotate: 540deg;
-        }
+    90% {
+      stroke-dasharray: 20 200;
+      stroke-width: 30;
+      stroke-dashoffset: -305;
+    }
 
-        62.5%,
-        75% {
-            rotate: 810deg;
-        }
+    98%, to {
+      stroke-dasharray: 0 220;
+      stroke-width: 20;
+      stroke-dashoffset: -330;
+    }
+  }
 
-        87.5%,
-        100% {
-            rotate: 1080deg;
-        }
-    }`;
+  @keyframes ringC {
+    from {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: 0;
+    }
+
+    8% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -5;
+    }
+
+    28% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -175;
+    }
+
+    36%, 58% {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: -220;
+    }
+
+    66% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -225;
+    }
+
+    86% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -395;
+    }
+
+    94%, to {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: -440;
+    }
+  }
+
+  @keyframes ringD {
+    from, 8% {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: 0;
+    }
+
+    16% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -5;
+    }
+
+    36% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -175;
+    }
+
+    44%, 50% {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: -220;
+    }
+
+    58% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -225;
+    }
+
+    78% {
+      stroke-dasharray: 40 400;
+      stroke-width: 30;
+      stroke-dashoffset: -395;
+    }
+
+    86%, to {
+      stroke-dasharray: 0 440;
+      stroke-width: 20;
+      stroke-dashoffset: -440;
+    }
+  }`;
 
 export default Loader;

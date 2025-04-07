@@ -1,24 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+  data: null,
+  loading: false,
+  error: null,
+};
+
 const statsSlice = createSlice({
   name: 'stats',
-  initialState: {
-    data: {},
-    loading: false,
-    error: null
-  },
+  initialState,
   reducers: {
-    fetchStatsStart: (state) => { state.loading = true; },
+    fetchStatsStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
     fetchStatsSuccess: (state, action) => {
-      state.data = action.payload;
       state.loading = false;
+      state.data = action.payload;
     },
     fetchStatsFailure: (state, action) => {
-      state.error = action.payload;
       state.loading = false;
-    }
-  }
+      state.error = action.payload;
+    },
+  },
 });
 
 export const { fetchStatsStart, fetchStatsSuccess, fetchStatsFailure } = statsSlice.actions;
+
 export default statsSlice.reducer;

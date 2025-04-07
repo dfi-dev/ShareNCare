@@ -14,7 +14,7 @@ const AnimatedButton = ({
         <motion.button
             type="button"
             onClick={onClick}
-            className={`flex items-center justify-center w-full bg-[#12b9b3] text-white p-[9px] rounded-lg hover:bg-[#10c1bb] text-sm font-[500] gap-1 ${className}`}
+            className={`flex items-center justify-center w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 p-[9px] rounded-lg text-sm font-[500] gap-1 ${className}`}
             whileHover={whileHover}
         >
             {Icon && iconPosition === "before" && (

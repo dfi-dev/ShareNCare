@@ -1,89 +1,109 @@
-import React, {useState, useEffect, useRef} from "react";
-import {motion} from "framer-motion";
-import {TbArrowsDiagonalMinimize2} from "react-icons/tb";
-import {MdCleaningServices} from "react-icons/md";
-import {GoAlertFill} from "react-icons/go"; // Individual notification delete icon
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { HiX, HiOutlineBell } from "react-icons/hi";
+import NotificationCard from "./NotificationCard";
 
-const NotificationList = ({notifications, onClose, onDelete}) => {
-    const listRef = useRef(null);
-    const [hasScrollbar, setHasScrollbar] = useState(false);
-    const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024); // lg breakpoint
-    let notificationLen = notifications.length;
+const NotificationList = ({ notifications, onDelete, onClearAll, onClose, onMarkAsRead }) => {
+  const listRef = useRef(null);
+  const [hasScrollbar, setHasScrollbar] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
 
-    useEffect(() => {
-        const checkScrollbar = () => {
-            if (listRef.current) {
-                const isOverflowing = listRef.current.scrollHeight > listRef.current.clientHeight;
-                setHasScrollbar(isOverflowing);
-                setIsLargeScreen(window.innerWidth >= 1024); // Update screen size state
-            }
-        };
+  useEffect(() => {
+    const checkScrollbar = () => {
+      if (listRef.current) {
+        setHasScrollbar(listRef.current.scrollHeight > listRef.current.clientHeight);
+        setIsLargeScreen(window.innerWidth >= 1024);
+      }
+    };
 
-        checkScrollbar();
-        window.addEventListener("resize", checkScrollbar);
+    checkScrollbar();
+    window.addEventListener("resize", checkScrollbar);
+    return () => window.removeEventListener("resize", checkScrollbar);
+  }, [notifications]);
 
-        return () => window.removeEventListener("resize", checkScrollbar);
-    }, [notifications]); // Runs when notifications change
+  const handleClearAll = (e) => {
+    e.stopPropagation();
+    onClearAll();
+  };
 
-    return (
-        <motion.div
-            initial={{x: "100%", opacity: 0}}
-            animate={{x: 0, opacity: 1}}
-            exit={{x: "100%", opacity: 0}}
-            transition={{duration: 0.4, ease: "easeInOut"}}
-            className="fixed top-0 right-0 w-full h-full lg:w-96 lg:max-h-[90vh] lg:h-auto lg:top-14 bg-white bg-opacity-60 backdrop-blur-md shadow-lg rounded-none lg:rounded-lg p-4 border border-gray-200 z-50 overflow-hidden"
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ x: "100%", opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: "100%", opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="fixed inset-0 lg:inset-auto lg:top-16 lg:right-4 w-full lg:w-96 h-screen lg:h-[85vh] max-h-screen bg-white/95 backdrop-blur-lg shadow-xl lg:rounded-xl border border-gray-200 z-50 overflow-hidden flex flex-col"
+
+      >
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm p-4 border-b border-gray-200 flex justify-between items-center">
+          <h3 className="font-medium text-gray-900 text-sm md:text-base">
+            {notifications.length > 0
+              ? `${notifications.length} New Notification${notifications.length !== 1 ? "s" : ""}`
+              : "No Notifications"}
+          </h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            aria-label="Close notifications"
+          >
+            <HiX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div
+          ref={listRef}
+          className={`flex-1 overflow-y-auto custom-scrollbar ${
+            isLargeScreen && hasScrollbar ? "pr-2" : ""
+          }`}
         >
-            {/* Header */}
-            <div className="flex justify-between items-center border-b pb-2 mb-3">
-                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                    <GoAlertFill className="text-lg text-red-600"/>
-                    {notificationLen > 0
-                        ? `You have ${notificationLen} new ${notificationLen === 1 ? "alert" : "alerts"}`
-                        : "You're all caught up!"}
-                </h3>
-                <button
-                    className="text-gray-500 text-lg hover:text-black transition duration-200"
-                    onClick={onClose} // Trigger close animation
-                >
-                    <TbArrowsDiagonalMinimize2/>
-                </button>
-            </div>
+          <AnimatePresence>
+            {notifications.length > 0 ? (
+              <ul className="space-y-2 p-3">
+                {notifications.map((notification) => (
+                  <NotificationCard
+                    key={notification.id}
+                    notification={notification}
+                    onDelete={onDelete}
+                    onMarkAsRead={onMarkAsRead}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center h-full p-8 text-center"
+              >
+                <HiOutlineBell className="w-12 h-12 text-gray-300 mb-4" />
+                <h4 className="text-gray-500 font-medium text-lg">All caught up!</h4>
+                <p className="text-sm text-gray-400 mt-2">
+                  You don't have any new notifications
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-            {/* Notification List with Scrollbar */}
-            <div
-                ref={listRef}
-                className={`overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 transition-all ${isLargeScreen && hasScrollbar ? "pr-2" : ""}`}
-                style={{
-                    maxHeight: notifications.length > 5 ? "calc(100vh - 50px)" : "auto",
-                    paddingBottom: "1rem",
-                }}
+        {/* Footer */}
+        {notifications.length > 0 && (
+          <div 
+            className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={handleClearAll}
+              className="w-full py-2 text-sm font-medium text-red-500 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"
             >
-                {notifications.length > 0 ? (
-                    <ul className="space-y-2">
-                        {notifications.map((notification) => (
-                            <li
-                                key={notification.id}
-                                className={`flex justify-between items-center text-sm text-gray-800 border-b pb-2 last:border-none p-4 rounded-md transition duration-200 bg-[#f5a2c421] hover:bg-[#fbf4f74f] ${isLargeScreen && hasScrollbar ? "mr-2" : ""} `}
-                            >
-                                <div>
-                                    <p>{notification.message}</p>
-                                    <span className="block text-xs text-gray-500">{notification.time}</span>
-                                </div>
-                                <button
-                                    onClick={() => onDelete(notification.id)}
-                                    className="text-blue-500 text-lg hover:text-blue-700 transition duration-200"
-                                >
-                                    <MdCleaningServices/>
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-600 text-sm text-center">No new notifications!</p>
-                )}
-            </div>
-        </motion.div>
-    );
+              Clear All Notifications
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  );
 };
 
 export default NotificationList;

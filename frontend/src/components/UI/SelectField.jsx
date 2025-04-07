@@ -14,7 +14,7 @@ const SelectField = ({ name, icon, options, value, onChange, required, error, on
                 name={name}
                 value={value}
                 onChange={onChange}
-                className="w-full py-[9px] px-[14px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10c1bb] text-sm appearance-none pr-10"
+                className="w-full py-[9px] px-[14px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm appearance-none pr-10"
                 required={required}
             >
                 {options.map((option, index) => (

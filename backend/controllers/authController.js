@@ -241,3 +241,9 @@ exports.googleAuthCallback = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Handle Google OAuth failure
+exports.googleAuthFailure = (req, res) => {
+  const failureRedirect = "http://localhost:5173/login-failed";
+  res.redirect(failureRedirect);
+};

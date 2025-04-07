@@ -1,6 +1,6 @@
 const express = require("express");
 const passport = require("passport");
-const { signup, login, forgotPassword, resetPassword, confirmEmail, googleAuth, googleAuthCallback} = require("../controllers/authController");
+const { signup, login, forgotPassword, resetPassword, confirmEmail, googleAuth, googleAuthCallback, googleAuthFailure} = require("../controllers/authController");
 const router = express.Router();
 
 // Signup
@@ -22,10 +22,9 @@ router.post("/confirm-email", confirmEmail);
 router.get("/google", googleAuth);
 
 // Google OAuth callback
-router.get(
-    "/google/callback",
-    passport.authenticate("google", { session: false }),
-    googleAuthCallback
-  );
+router.get("/google/callback", passport.authenticate("google", { session: false, failureRedirect: "/auth/google/failure" }), googleAuthCallback);
+
+// Handle failed authentication
+router.get("/auth/google/failure", googleAuthFailure);
 
 module.exports = router;

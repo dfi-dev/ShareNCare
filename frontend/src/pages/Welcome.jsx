@@ -1,126 +1,175 @@
 import { motion } from "framer-motion";
 import Testimonial from "../components/Testimonials/Testimonial.jsx";
-import {FaArrowPointer} from "react-icons/fa6";
-import {FaHandsHelping, FaUsers} from "react-icons/fa";
-import { Ri24HoursFill } from "react-icons/ri";
+import { FaUsers } from "react-icons/fa";
+import { FaArrowPointer } from "react-icons/fa6";
+import { IoShirtOutline } from "react-icons/io5";
+import CommunityImpact from "../components/Stats/CommunityImpact.jsx";
+import { FaHandsHelping, FaShieldAlt, FaChartLine } from "react-icons/fa";
+import FeatureGrid from "../components/Modals/FeatureGrid.jsx";
+import FeatureCard from "../components/Modals/FeatureGrid.jsx";
+
 
 const Welcome = () => {
   const testimonialData = [
-      {name: "Sunny Kumar", imageUrl: "https://randomuser.me/api/portraits/men/35.jpg", description: "ShareNCare has transformed the way I contribute to society. It's simple, fast, and truly impactful!", type: "Donor"},
-      {name: "Michelle", imageUrl: "https://randomuser.me/api/portraits/women/60.jpg", description: "ShareNCare has revolutionized my way of giving back. It's so simple, yet so powerful!", type: "Recipient"},
+    {
+      name: "Sunny Kumar",
+      imageUrl: "https://randomuser.me/api/portraits/men/357.jpg",
+      description: "ShareNCare has transformed the way I contribute to society. It's simple, fast, and truly impactful!",
+      type: "Donor"
+    },
+    {
+      name: "Shubham Yadav",
+      imageUrl: "https://randomuser.me/api/portraits/women/607.jpg",
+      description: "ShareNCare has revolutionized my way of giving back. It's so simple, yet so powerful!",
+      type: "Recipient"
+    },
+    {
+      name: "Nidhi Kumari",
+      imageUrl: "https://randomuser.me/api/portraits/men/357.jpg",
+      description: "ShareNCare has transformed the way I contribute to society. It's simple, fast, and truly impactful!",
+      type: "Donor"
+    },
   ]
+
+  const features = [
+    {
+      icon: <FaHandsHelping />,
+      title: "Seamless Donations",
+      description: "Quick and secure giving with just a few clicks.",
+      bgColor: "bg-blue-400",
+    },
+    {
+      icon: <FaShieldAlt />,
+      title: "Trust & Transparency",
+      description: "Track where your donation goes in real-time.",
+      bgColor: "bg-teal-500",
+    },
+    {
+      icon: <FaChartLine />,
+      title: "Impact Insights",
+      description: "Visualize the change your support makes.",
+      bgColor: "bg-violet-500",
+    },
+  ];
+
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <header className="relative isolate px-6 pt-14 lg:px-8">
-        <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-          <div
-            className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] 
-            bg-gradient-to-tr from-pink-400 to-indigo-500 opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-            style={{
-              clipPath:
-                "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-            }}
-          />
-        </div>
-        <motion.div
-          className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56 text-center"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            Empowering Your Generosity
-          </h1>
-          <p className="mt-6 text-lg text-gray-700">
-            ShareNCare connects donors with those in need. Donate items, contribute to social impact, and make a difference today.
-          </p>
-          <div className="mt-8 flex justify-center gap-x-4">
-            <a
-              href="#"
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-base font-semibold text-white shadow-md hover:bg-indigo-500 transition duration-300"
-            >
-              Get Started
-            </a>
-            <a
-              href="#"
-              className="rounded-lg px-4 py-2 text-base font-semibold text-gray-900 border border-gray-300 shadow-md hover:bg-gray-100 transition duration-300"
-            >
-              Learn More →
-            </a>
-          </div>
+      <header className="relative isolate px-6 pt-24 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-blue-100"></div>
 
+        <div className="absolute -top-20 -left-20 w-96 h-96 bg-gradient-to-r from-indigo-200 to-purple-300 rounded-full filter blur-3xl opacity-20 -z-10"></div>
+        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-gradient-to-r from-pink-200 to-rose-300 rounded-full filter blur-3xl opacity-20 -z-10"></div>
+
+        <motion.div
+          className="mx-auto max-w-4xl py-20 sm:py-28 lg:py-28 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-100 text-indigo-600 text-sm font-medium mb-6 shadow-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-indigo-600 mr-2 animate-pulse"></span>
+            Join the Movement
+          </motion.div>
+
+          <motion.h1
+            className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl md:text-7xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
+              Empower
+            </span> Your Generosity
+          </motion.h1>
+
+          <motion.p
+            className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            ShareNCare bridges compassion with action. Transform lives through simple, meaningful donations.
+          </motion.p>
+
+          <motion.div
+            className="mt-10 flex flex-col items-center sm:flex-row sm:justify-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
+            {/* Get Started */}
+            <motion.a
+              href="#"
+              className="w-40 sm:w-48 h-12 overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 px-5 py-2.5 text-base font-medium text-white shadow-md hover:shadow-lg transition-all duration-300 group flex items-center justify-center"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="relative z-10">Get Started</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </motion.a>
+
+            {/* Learn More */}
+            <motion.a
+              href="#"
+              className="w-40 sm:w-48 h-12 overflow-hidden rounded-lg bg-white hover:bg-gray-100 px-5 py-2.5 text-base font-medium text-slate-800 border border-slate-200 shadow-md hover:shadow-lg transition-all duration-300 group flex items-center justify-center gap-1 relative"
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="transition-colors duration-300 group-hover:text-slate-900">
+                Learn More
+              </span>
+              <span className="transition-colors duration-300 text-blue-600 group-hover:text-blue-700">
+                →
+              </span>
+            </motion.a>
+          </motion.div>
         </motion.div>
       </header>
 
       {/* Community Impact Section */}
-      <section className="py-10 bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold text-gray-900">Community Impact</h2>
-          <motion.div
-            className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-8"
-            whileInView={{ opacity: 1, scale: 1 }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: false }}
-          >
-            {[
-              { title: <>Total Users <FaUsers className="text-2xl inline-block"/></>, value: "25,000+", customStyle: { backgroundColor: "rgb(63 59 246 / 58%)" } },
-              { title: <>New in Last 24 Hrs <Ri24HoursFill className="text-2xl inline-block"/></>, value: "150+", bgColor: "bg-green-500" },
-              { title: <>Recipients Helped <FaHandsHelping className="text-2xl inline-block"/></>, value: "12,000+", customStyle: { backgroundColor: "rgb(221 148 8)" } },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                className={`p-6 text-white rounded-lg shadow-lg transition duration-300 ${stat.bgColor || ""}`}
-                whileHover={{ scale: 1.05 }}
-                style={stat.customStyle || {}}
-              >
-                <h3 className="text-3xl font-bold">{stat.value}</h3>
-                <p className="mt-2 text-lg">{stat.title}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+      <CommunityImpact />
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-            Why Choose ShareNCare?
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
-            Making donations easy, impactful, and transparent.
-          </p>
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
-            className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.8 }}
-            viewport={{ once: false }}
+            viewport={{ once: true }}
           >
-            {[
-              { title: "Easy Donations", description: <>Donate clothes, food, and more with a single click<FaArrowPointer className="inline-block ml-2"/></>, customStyle: { backgroundColor: "rgb(131 131 131)" } },
-              { title: "Real-Time Updates", description: "Track your donations and see their impact live.", customStyle: { backgroundColor: "rgb(215 164 120)" } },
-              { title: "Community-Driven", description: "Join a network of like-minded donors and volunteers.", customStyle: { backgroundColor: "rgb(109 155 211)" } },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                className="p-6 text-white rounded-lg shadow-lg transition duration-300"
-                style={item.customStyle}
-                whileHover={{ scale: 1.05 }}
-              >
-                <h3 className="text-2xl font-semibold">{item.title}</h3>
-                <p className="mt-2">{item.description}</p>
-              </motion.div>
-            ))}
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-indigo-100 text-indigo-600 text-sm font-medium mb-4">
+              <span className="w-2 h-2 rounded-full bg-indigo-600 mr-2 animate-pulse"></span>
+              Our Features
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+              Why Choose Donate2Serve?
+            </h2>
+            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+              Making donations <span className="font-semibold text-indigo-600">easy</span>,{" "}
+              <span className="font-semibold text-teal-600">impactful</span>, and{" "}
+              <span className="font-semibold text-purple-600">transparent</span>.
+            </p>
           </motion.div>
+
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature, index) => (
+              <FeatureCard key={index} {...feature} index={index} />
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <Testimonial userList={testimonialData}/>
+      <Testimonial userList={testimonialData} />
     </div>
   );
 };

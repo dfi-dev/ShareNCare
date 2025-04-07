@@ -1,60 +1,124 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import { MdOutlineClose } from "react-icons/md";
-import {GoAlertFill} from "react-icons/go";
-import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { GoAlertFill } from "react-icons/go";
+import { IoMdCheckmarkCircle } from "react-icons/io";
+import { MdErrorOutline } from "react-icons/md";
 
-
-const Modal = ({ type = "error", message = "Something went wrong!", onClose }) => {
+const Modal = ({ type = "error", message = "Something went wrong!", onClose, autoClose = 6000 }) => {
     useEffect(() => {
-        const closeTimer = setTimeout(() => {
-            onClose();
-        }, 6000);
-
-        return () => {
-            clearTimeout(closeTimer);
-        };
-    }, [onClose]);
+        if (autoClose) {
+            const closeTimer = setTimeout(() => {
+                onClose();
+            }, autoClose);
+            return () => clearTimeout(closeTimer);
+        }
+    }, [onClose, autoClose]);
 
     const types = {
-        error: { icon: < MdOutlineClose className="text-red-500" />, border: "border-red-500/50", buttonColor: "from-pink-500 to-red-500" },
-        success: { icon: <IoMdCheckmarkCircleOutline className="text-green-500" />, border: "border-green-500/50", buttonColor: "from-emerald-500 to-cyan-500" },
-        alert: { icon: <GoAlertFill className="text-yellow-500" />, border: "border-yellow-500/50", buttonColor: "from-yellow-500 to-orange-400" },
+        error: { 
+            icon: <MdErrorOutline className="w-12 h-12" />,
+            colors: {
+                bg: "bg-red-50",
+                border: "border-red-200",
+                icon: "text-red-500",
+                button: "bg-red-500 hover:bg-red-600",
+                progress: "bg-red-500"
+            }
+        },
+        success: { 
+            icon: <IoMdCheckmarkCircle className="w-12 h-12" />,
+            colors: {
+                bg: "bg-green-50",
+                border: "border-green-200",
+                icon: "text-green-500",
+                button: "bg-green-500 hover:bg-green-600",
+                progress: "bg-green-500"
+            }
+        },
+        alert: { 
+            icon: <GoAlertFill className="w-12 h-12" />,
+            colors: {
+                bg: "bg-yellow-50",
+                border: "border-yellow-200",
+                icon: "text-yellow-500",
+                button: "bg-yellow-500 hover:bg-yellow-600",
+                progress: "bg-yellow-500"
+            }
+        },
     };
 
+    const currentType = types[type] || types.error;
+
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="relative min-w-[300px] sm:min-w-[400px] md:min-w-[500px] px-8 py-8 rounded-lg shadow-2xl border border-gray-200 bg-white"
-            >
-                <div className="flex flex-col items-center text-center">
-                    <button
-                        onClick={onClose}
-                        className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition-transform transform hover:scale-110"
-                    >
-                        <X size={22} />
-                    </button>
+        <AnimatePresence>
+            <div className="fixed inset-0 flex items-center justify-center p-4 z-[100]">
+                {/* Backdrop */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm"
+                    onClick={onClose}
+                />
 
-                    <div className="text-4xl">{types[type].icon}</div>
+                {/* Modal Content */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                    className={`relative max-w-md w-full rounded-xl shadow-2xl border ${currentType.colors.border} ${currentType.colors.bg} overflow-hidden`}
+                >
+                    {/* Auto-close progress bar */}
+                    {autoClose && (
+                        <motion.div
+                            initial={{ width: "100%" }}
+                            animate={{ width: 0 }}
+                            transition={{ duration: autoClose / 1000, ease: "linear" }}
+                            className={`h-1 ${currentType.colors.progress}`}
+                        />
+                    )}
 
-                    <p className="text-lg font-semibold text-gray-800 mt-3 break-words">
-                        {message}
-                    </p>
+                    <div className="p-6">
+                        {/* Close button */}
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
 
-                    <button
-                        onClick={onClose}
-                        className={`mt-4 px-6 py-2 bg-gradient-to-r ${types[type].buttonColor} text-white rounded-md transition`}
-                    >
-                        Ok
-                    </button>
-                </div>
-            </motion.div>
-        </div>
+                        {/* Icon */}
+                        <div className={`flex justify-center ${currentType.colors.icon}`}>
+                            {currentType.icon}
+                        </div>
+
+                        {/* Message */}
+                        <div className="mt-4 text-center">
+                            <h3 className="text-lg font-semibold text-gray-800">
+                                {type === "error" && "Error"}
+                                {type === "success" && "Success"}
+                                {type === "alert" && "Notice"}
+                            </h3>
+                            <p className="mt-2 text-gray-600 break-words">
+                                {message}
+                            </p>
+                        </div>
+
+                        {/* Action button */}
+                        <div className="mt-6 flex justify-center">
+                            <button
+                                onClick={onClose}
+                                className={`px-5 py-2 rounded-lg text-white font-medium transition-colors ${currentType.colors.button}`}
+                            >
+                                Okay
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        </AnimatePresence>
     );
 };
 

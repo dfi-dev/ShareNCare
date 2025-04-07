@@ -1,13 +1,20 @@
+import { useState } from "react";
 import OTPModal from "../components/Modals/OTPModal";
 
 const OTPPage = () => {
+  const [showModal, setShowModal] = useState(true);
+  const email = "email4workonpc@gmail.com";
+
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-black bg-opacity-60">
-      <div className="bg-white/10 backdrop-blur-md rounded-lg shadow-lg p-6">
-        <OTPModal />
-      </div>
-    </div>
+    <>
+      {showModal && (
+        <OTPModal
+          email={email}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </>
   );
-}
+};
 
 export default OTPPage;

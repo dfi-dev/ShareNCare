@@ -7,12 +7,12 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      scope: ["profile", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
         let user = await User.findOne({ email: profile.emails[0].value });
-        console.log("Google Profile Data:", JSON.stringify(profile, null, 2));
         if (!user) {
           user = new User({
             fullName: profile.displayName,

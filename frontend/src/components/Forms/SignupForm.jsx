@@ -62,13 +62,6 @@ const SignupForm = ({ formData, setFormData, errors, setErrors, onSubmit }) => {
 
     return (
         <>
-
-        <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl text-gray-700 text-center w-full flex items-center justify-center gap-2">
-                {step === 1 ? "Let's Get Started!" : step === 2 ? "You're Almost There!" : "Final Step!"}
-            </h2>
-        </div>
-
         <form onSubmit={handleSubmit} className="flex-grow flex flex-col">
             <motion.div
                 key={step}
@@ -122,6 +115,7 @@ const SignupForm = ({ formData, setFormData, errors, setErrors, onSubmit }) => {
                                 Icon={MdOutlineKeyboardDoubleArrowRight}
                                 iconAnimation={{ x: [0, 4, 0] }}
                                 iconPosition="after"
+                                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700"
                             >
                                 Next
                             </AnimatedButton>

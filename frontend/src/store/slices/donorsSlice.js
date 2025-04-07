@@ -3,22 +3,30 @@ import { createSlice } from '@reduxjs/toolkit';
 const donorsSlice = createSlice({
   name: 'donors',
   initialState: {
-    list: [],
+    topDonors: [],
     loading: false,
-    error: null
+    error: null,
   },
   reducers: {
-    fetchDonorsStart: (state) => { state.loading = true; },
-    fetchDonorsSuccess: (state, action) => {
-      state.list = action.payload;
-      state.loading = false;
+    fetchTopDonorsStart: (state) => {
+      state.loading = true;
+      state.error = null;
     },
-    fetchDonorsFailure: (state, action) => {
-      state.error = action.payload;
+    fetchTopDonorsSuccess: (state, action) => {
       state.loading = false;
-    }
-  }
+      state.topDonors = action.payload;
+    },
+    fetchTopDonorsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+  },
 });
 
-export const { fetchDonorsStart, fetchDonorsSuccess, fetchDonorsFailure } = donorsSlice.actions;
+export const {
+  fetchTopDonorsStart,
+  fetchTopDonorsSuccess,
+  fetchTopDonorsFailure,
+} = donorsSlice.actions;
+
 export default donorsSlice.reducer;

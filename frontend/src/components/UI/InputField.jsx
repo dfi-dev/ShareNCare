@@ -17,7 +17,7 @@ export default function InputField({ name,type, placeholder, icon, value, onChan
                 placeholder={placeholder}
                 value={value}
                 onChange={onChange}
-                className="w-full py-[9px] px-[14px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10c1bb] text-sm pr-10"
+                className="w-full py-[9px] px-[14px] border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm pr-10"
             />
             <span className="absolute right-[20px] top-3 text-gray-500">{icon}</span>
 
