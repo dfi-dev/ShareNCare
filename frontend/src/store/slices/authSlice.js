@@ -1,17 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { loginUser, registerUser } from '../actions/authActions';
 
-// Safely parse localStorage data
+// Parse localStorage safely
 let storedUser = null;
 try {
   storedUser = JSON.parse(localStorage.getItem('user'));
-} catch (e) {
+} catch {
   storedUser = null;
 }
 
 const initialState = {
   isAuthenticated: !!localStorage.getItem('token'),
-  user: storedUser || null,
-  token: localStorage.getItem('token') || null,
+  user: storedUser,
+  token: localStorage.getItem('token'),
   loading: false,
   error: null,
 };
@@ -20,14 +21,6 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginSuccess: (state, action) => {
-      state.isAuthenticated = true;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.error = null;
-      localStorage.setItem('user', JSON.stringify(action.payload.user));
-      localStorage.setItem('token', action.payload.token);
-    },
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
@@ -36,18 +29,46 @@ const authSlice = createSlice({
       localStorage.removeItem('user');
       localStorage.removeItem('token');
     },
-    setLoading: (state, action) => {
-      state.loading = action.payload;
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
-    },
     clearError: (state) => {
       state.error = null;
-    }
-  }
+    },
+  },
+  extraReducers: (builder) => {
+    // Login lifecycle
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        localStorage.setItem('token', action.payload.token);
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Register lifecycle
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
-export const {loginSuccess,logout,setLoading,setError,clearError} = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 
 export default authSlice.reducer;

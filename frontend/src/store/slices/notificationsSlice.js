@@ -1,34 +1,40 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const notificationsSlice = createSlice({
+const initialState = {
+  list: [],
+  loading: false,
+  error: null,
+};
+
+const notificationSlice = createSlice({
   name: 'notifications',
-  initialState: {
-    list: [],
-    unreadCount: 0,
-    loading: false,
-    error: null
-  },
+  initialState,
   reducers: {
-    fetchNotificationsStart: (state) => { state.loading = true; },
+    fetchNotificationsStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
     fetchNotificationsSuccess: (state, action) => {
-      state.list = action.payload;
-      state.unreadCount = action.payload.filter(n => !n.isRead).length;
       state.loading = false;
+      state.list = action.payload;
+    },
+    fetchNotificationsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     },
     markAsRead: (state, action) => {
       const id = action.payload;
-      const notification = state.list.find(n => n.id === id);
-      if (notification) {
-        notification.isRead = true;
-        state.unreadCount -= 1;
-      }
-    },
-    fetchNotificationsFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
+      const notif = state.list.find(n => n._id === id);
+      if (notif) notif.isRead = true;
     }
   }
 });
 
-export const { fetchNotificationsStart, fetchNotificationsSuccess, markAsRead, fetchNotificationsFailure } = notificationsSlice.actions;
-export default notificationsSlice.reducer;
+export const {
+  fetchNotificationsStart,
+  fetchNotificationsSuccess,
+  fetchNotificationsFailure,
+  markAsRead
+} = notificationSlice.actions;
+
+export default notificationSlice.reducer;

@@ -1,19 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import donorsReducer from './slices/donorsSlice';
-import donationReducer from './slices/donationSlice';
-import statsReducer from './slices/statsSlice';
 import authReducer from './slices/authSlice';
-import dashboardReducer from './slices/dashboardSlice';
+import profileReducer from './slices/profileSlice';
+import donorDataReducer from './slices/donorDataSlice';
+import recipientDataReducer from './slices/recipientDataSlice';
 import notificationsReducer from './slices/notificationsSlice';
+import adminDataReducer from './slices/adminDataSlice';
+import statsReducer from "./slices/statsSlice";
 
 const store = configureStore({
   reducer: {
-    donors: donorsReducer,
-    dashboard: dashboardReducer,
-    donations: donationReducer,
-    stats: statsReducer,
     auth: authReducer,
-    notifications: notificationsReducer
+    profile: profileReducer,
+    donorData: donorDataReducer,
+    recipientData: recipientDataReducer,
+    notifications: notificationsReducer,
+    adminData: adminDataReducer,
+    stats: statsReducer,
   }
 });
 

@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import SignupForm from "../components/Forms/SignupForm.jsx";
-import SocialButton from "../components/UI/SocialButton.jsx";
-import Loader from "../components/Loaders/Loader.jsx";
-import Modal from "../components/Modals/Modal.jsx";
-import { validateForm } from "../utils/validateForm.js";
-import { registerUser } from "../store/actions/authActions.js";
+import SignupForm from "../../components/Forms/SignupForm.jsx";
+import SocialButton from "../../components/UI/SocialButton.jsx";
+import Loader from "../../components/Loaders/Loader.jsx";
+import Modal from "../../components/Modals/Modal.jsx";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { validateForm } from "../../utils/validateForm.js";
+import { registerUser } from "../../store/actions/authActions.js";
 
 export default function SignupPage() {
     const dispatch = useDispatch();
@@ -36,10 +37,10 @@ export default function SignupPage() {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
-            setModal({ 
-                show: true, 
-                type: "error", 
-                message: "Please fix the highlighted fields before submitting." 
+            setModal({
+                show: true,
+                type: "error",
+                message: "Please fix the highlighted fields before submitting."
             });
             return;
         }
@@ -56,12 +57,13 @@ export default function SignupPage() {
         };
 
         try {
-            const response = await dispatch(registerUser(payload));
+            const resultAction = await dispatch(registerUser(payload));
+            const data = unwrapResult(resultAction); // ✅ unwrap for success/error
 
             setModal({
                 show: true,
                 type: "success",
-                message: response.message || "Account created successfully! Redirecting to login..."
+                message: data.message || "Account created successfully! Redirecting to login..."
             });
 
             setTimeout(() => {
@@ -72,15 +74,16 @@ export default function SignupPage() {
             setModal({
                 show: true,
                 type: "error",
-                message: err.message || "Registration failed. Please try again."
+                message: err || "Registration failed. Please try again."
             });
         }
     };
 
+    
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 flex items-center justify-center p-4 relative overflow-hidden">
             {/* Animated background elements */}
-            <motion.div 
+            <motion.div
                 className="absolute top-0 left-0 w-full h-full overflow-hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -115,7 +118,7 @@ export default function SignupPage() {
             </motion.div>
 
             {loading && <Loader />}
-            
+
             <AnimatePresence>
                 <motion.div
                     initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -150,7 +153,7 @@ export default function SignupPage() {
                                         </svg>
                                     </div>
                                 </motion.div>
-                                
+
                                 <motion.h2
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}

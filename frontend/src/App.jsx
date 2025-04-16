@@ -1,17 +1,16 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Footer from "./components/Layout/Footer.jsx";
-import Header from "./components/Layout/Header.jsx";
-import Welcome from "./pages/Welcome.jsx";
-import About from "./pages/About.jsx";
-import Contact from "./pages/Contact.jsx";
-import TopDonors from "./pages/TopDonors.jsx";
-import Donate from "./pages/Donate.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
-import SignupPage from "./pages/SignupPage.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import ConfirmEmailPage from './pages/ConfirmEmailPage.jsx';
-import NotFoundPage from './pages/NotFoundPage.jsx';
-import OTPPage from './pages/OTPPage.jsx';
+import PublicHeader from "./components/Layout/PublicHeader.jsx";
+import Welcome from "./pages/public/Welcome.jsx";
+import About from "./pages/public/About.jsx";
+import Contact from "./pages/public/Contact.jsx";
+import TopDonors from "./pages/public//TopDonors.jsx";
+import Donate from "./pages/public/Donate.jsx";
+import LoginPage from "./pages/public/LoginPage.jsx";
+import SignupPage from "./pages/public/SignupPage.jsx";
+import ConfirmEmailPage from './pages/public/ConfirmEmailPage.jsx';
+import NotFoundPage from './pages/public/NotFoundPage.jsx';
+import DonorLanding from './pages/donor/DonorLanding.jsx';
 
 const App = () => {
     const location = useLocation();
@@ -21,7 +20,7 @@ const App = () => {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {!hideHeaderFooter && <Header />}
+            {!hideHeaderFooter && <PublicHeader />}
 
             <main className="flex-grow">
                 <Routes>
@@ -32,9 +31,8 @@ const App = () => {
                     <Route path="/top-donors" element={<TopDonors />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/confirm-email" element={<ConfirmEmailPage />} />
-                    <Route path="/otp" element={<OTPPage />} />
+                    <Route path="/donor/dashboard" element={<DonorLanding />} />
 
                     {/* 404 Not Found Route */}
                     <Route path="*" element={<NotFoundPage/>} />

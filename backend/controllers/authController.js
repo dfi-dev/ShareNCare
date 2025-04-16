@@ -242,8 +242,39 @@ exports.googleAuthCallback = async (req, res) => {
   }
 };
 
-// Handle Google OAuth failure
-exports.googleAuthFailure = (req, res) => {
-  const failureRedirect = "http://localhost:5173/login-failed";
-  res.redirect(failureRedirect);
+// Github OAuth Redirect (handled by Passport)
+exports.githubAuth = (req, res, next) => {
+  passport.authenticate("github", { scope: ["user:email"] })(req, res, next);
+};
+
+
+// Github OAuth Callback
+exports.githubAuthCallback = async (req, res) => {
+  try {
+    const user = req.user; // Retrieved from Passport GitHub strategy
+
+    if (!user) {
+      return res.status(401).json({ message: "GitHub authentication failed" });
+    }
+
+    const token = generateJWTToken({ userId: user._id, fullName: user.fullName });
+
+    res.status(200).json({
+      message: "GitHub login successful",
+      token,
+      user: userDTO(user),
+    });
+  } catch (error) {
+    console.error("GitHub login error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.oauthAuthFailure = (req, res) => {
+    // You can send specific details about the failure
+    const errorMessage = req.query.error_description || "OAuth authentication was canceled by the user.";
+  
+    // Redirect to frontend with the error message
+    const failureRedirect = `http://localhost:5173/login-failed?error=true&message=${encodeURIComponent(errorMessage)}`;
+    res.redirect(failureRedirect);
 };

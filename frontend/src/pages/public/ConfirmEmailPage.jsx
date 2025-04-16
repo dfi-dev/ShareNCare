@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import Loader from "../components/Loaders/Loader";
-import Modal from "../components/Modals/Modal";
+import Loader from "../../components/Loaders/Loader";
+import Modal from "../../components/Modals/Modal";
 
 const ConfirmEmailPage = () => {
     const [searchParams] = useSearchParams();

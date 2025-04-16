@@ -2,11 +2,12 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { loginUser } from "../store/actions/authActions";
-import SocialButton from "../components/UI/SocialButton.jsx";
-import LoginForm from "../components/Forms/LoginForm.jsx";
-import Modal from "../components/Modals/Modal.jsx";
-import Loader from "../components/Loaders/Loader.jsx";
+import { loginUser } from "../../store/actions/authActions.js";
+import SocialButton from "../../components/UI/SocialButton.jsx";
+import LoginForm from "../../components/Forms/LoginForm.jsx";
+import Modal from "../../components/Modals/Modal.jsx";
+import Loader from "../../components/Loaders/Loader.jsx";
+import { unwrapResult } from "@reduxjs/toolkit"; // ✅ import this
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -22,7 +23,9 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      await dispatch(loginUser(formData));
+      // ✅ Dispatch and unwrap result
+      const resultAction = await dispatch(loginUser(formData));
+      unwrapResult(resultAction); // throws error if rejected
 
       setModal({
         show: true,
@@ -31,13 +34,13 @@ const LoginPage = () => {
       });
 
       setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/donor/dashboard");
       }, 1500);
     } catch (err) {
       setModal({
         show: true,
         type: "error",
-        message: err.message || "Login failed. Please try again.",
+        message: err || "Login failed. Please try again.",
       });
     }
   };

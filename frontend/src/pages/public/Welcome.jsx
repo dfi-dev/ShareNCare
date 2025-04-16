@@ -1,12 +1,8 @@
 import { motion } from "framer-motion";
-import Testimonial from "../components/Testimonials/Testimonial.jsx";
-import { FaUsers } from "react-icons/fa";
-import { FaArrowPointer } from "react-icons/fa6";
-import { IoShirtOutline } from "react-icons/io5";
-import CommunityImpact from "../components/Stats/CommunityImpact.jsx";
+import Testimonial from "../../components/Testimonials/Testimonial.jsx";
+import CommunityImpact from "../../components/Stats/CommunityImpact.jsx";
 import { FaHandsHelping, FaShieldAlt, FaChartLine } from "react-icons/fa";
-import FeatureGrid from "../components/Modals/FeatureGrid.jsx";
-import FeatureCard from "../components/Modals/FeatureGrid.jsx";
+import FeatureCard from "../../components/Modals/FeatureGrid.jsx";
 
 
 const Welcome = () => {

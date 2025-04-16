@@ -16,10 +16,10 @@ const navigation = [
   { name: 'Top Donors', path: '/top-donors' },
 ]
 
-export default function Header() {
+export default function PublicHeader() {
   const notificationCount = 5
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [notificationOpen, setNotificationOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)

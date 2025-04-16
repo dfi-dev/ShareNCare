@@ -1,16 +1,19 @@
-import axios from 'axios';
-import { fetchStatsStart, fetchStatsSuccess, fetchStatsFailure } from '../slices/statsSlice';
+import axios from "axios";
+import { asyncThunkWrapper } from "../../utils/asyncThunkWrapper";
+import {
+  fetchStatsStart,
+  fetchStatsSuccess,
+  fetchStatsFailure,
+} from "../slices/statsSlice";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const fetchStats = () => async (dispatch) => {
-  dispatch(fetchStatsStart());
-
-  try {
-    const response = await axios.get(`${BASE_URL}/api/stats`);
-    dispatch(fetchStatsSuccess(response.data));
-  } catch (error) {
-    const msg = error.response?.data?.message || 'Failed to fetch statistics';
-    dispatch(fetchStatsFailure(msg));
-  }
+  return asyncThunkWrapper({
+    dispatch,
+    asyncFunc: () => axios.get(`${BASE_URL}/api/stats`).then((res) => res.data),
+    startAction: fetchStatsStart,
+    successAction: fetchStatsSuccess,
+    failureAction: fetchStatsFailure,
+  });
 };

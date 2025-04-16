@@ -61,8 +61,11 @@ const CommunityImpact = () => {
   const inView = useInView(containerRef, { once: true, amount: 0.2 });
 
   useEffect(() => {
-    dispatch(fetchStats());
-  }, [dispatch]);
+    if (inView && !stats && !loading) {
+      dispatch(fetchStats());
+    }
+  }, [dispatch, inView, stats, loading]);
+
 
   const statItems = [
     { 
