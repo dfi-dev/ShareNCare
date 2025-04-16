@@ -7,7 +7,7 @@ const getEmailTemplate = require("../templates/emailTemplate");
 const emailContent = require("../templates/emailContent");
 const jwt = require('jsonwebtoken');
 const passport = require("passport");
-
+const { successResponse, errorResponse } = require('../utils/responseHelper.js');
 
 
 // Signup
@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email is already registered" });
+      return errorResponse(res, "Email is already registered", {}, 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,7 +39,7 @@ exports.signup = async (req, res) => {
     // Generate confirmation token
     const emailConfirmationToken = generateJWTToken({ userId: newUser._id })
 
-    newUser.emailConfirmationToken = emailConfirmationToken;
+    newUser.emailConfirmationToken = "emailConfirmationToken";
     await newUser.save();
 
     // Send confirmation email
@@ -54,13 +54,15 @@ exports.signup = async (req, res) => {
     );
 
     await sendEmail(newUser.email, emailContent.CONFIRM_EMAIL.title, confirmationHTML);
-    res.status(201).json({
-      message: "User registered successfully! Please check your email to confirm your account.",
+
+    // Send success response
+    return successResponse(res, "User registered successfully! Please check your email to confirm your account.", {
       user: userDTO(newUser),
-    });
+    }, 201);
   } catch (err) {
     console.error("Signup error:", err);
-    res.status(500).json({ message: "Signup failed", error: err.message });
+    // Send error response in case of failure
+    return errorResponse(res, "Signup failed", { message: err.message }, 500);
   }
 };
 
@@ -72,31 +74,44 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return errorResponse(res, "Invalid credentials", {}, 401);
     }
 
     if (user.isDeleted) {
-      return res.status(403).json({ message: "The account could not be found or may have been deleted. Please contact support for assistance." });
+      return errorResponse(
+        res,
+        "The account could not be found or may have been deleted. Please contact support for assistance.",
+        {},
+        403
+      );
     }
 
     if (!user.isEmailConfirmed) {
-      return res.status(403).json({
-        message: "Please confirm your email before logging in."
-      });
+      return errorResponse(
+        res,
+        "Please confirm your email before logging in.",
+        {},
+        403
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return errorResponse(res, "Invalid credentials", {}, 401);
     }
 
-    const token = generateJWTToken({ userId: user._id, fullName: user.fullName })
+    const token = sgenerateJWTToken({ userId: user._id, fullName: user.fullName })
 
-    res.json({ token, user: userDTO(user) });
+    // Send success response with token and user data
+    return successResponse(res, "Login successful", {
+      token,
+      user: userDTO(user),
+    }, 200);
 
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ message: "Login failed", error: err.message });
+    // Send error response in case of any unexpected issues
+    return errorResponse(res, "Login failed", { message: err.message }, 500);
   }
 };
 
@@ -105,87 +120,87 @@ exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-      const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
+    if (!user) {
+      return errorResponse(res, "User not found", {}, 404);
+    }
 
-      const { resetToken, resetTokenHash } = generatePasswordResetToken();
-      
-      user.resetPasswordToken = resetTokenHash;
-      user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
+    const { resetToken, resetTokenHash } = generatePasswordResetToken();
 
-      await user.save();
+    user.resetPasswordToken = resetTokenHash;
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
 
-      const resetLink = `${process.env.FRONTEND_URL || "https://www.example.com"}/reset-password/${resetToken}`;
-      // Generate the HTML email template
-      const resetHTML = getEmailTemplate(
-        user.fullName, // User's name
-        emailContent.PASSWORD_RESET.title,
-        `${emailContent.PASSWORD_RESET.message}<br><strong>Reset Link:</strong> <a href="${resetLink}" target="_blank">Reset Password</a>`,
-        emailContent.PASSWORD_RESET.buttonText,
-        resetLink
-      );
+    await user.save();
 
-      // Send the reset email
-      await sendEmail(
-        user.email,
-        emailContent.PASSWORD_RESET.title,
-        resetHTML
-      );
+    const resetLink = `${process.env.FRONTEND_URL || "https://www.example.com"}/reset-password/${resetToken}`;
+    // Generate the HTML email template
+    const resetHTML = getEmailTemplate(
+      user.fullName, // User's name
+      emailContent.PASSWORD_RESET.title,
+      `${emailContent.PASSWORD_RESET.message}<br><strong>Reset Link:</strong> <a href="${resetLink}" target="_blank">Reset Password</a>`,
+      emailContent.PASSWORD_RESET.buttonText,
+      resetLink
+    );
 
-      res.status(200).json({
-          message: "Password reset link sent successfully. Check your email."
-      });
+    // Send the reset email
+    await sendEmail(
+      user.email,
+      emailContent.PASSWORD_RESET.title,
+      resetHTML
+    );
+
+    return successResponse(res, "Password reset link sent successfully. Check your email.");
 
   } catch (error) {
-      console.error("Forgot password error:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+    console.error("Forgot password error:", error);
+    return errorResponse(res, "Internal Server Error", error.message, 500);
   }
 };
 
 
 exports.resetPassword = async (req, res) => {
   try {
-      const { newPassword } = req.body;   
-      const { token } = req.params;
+    const { newPassword } = req.body;
+    const { token } = req.params;
 
-      if (!token) {
-          return res.status(400).json({ message: "Reset token is required." });
-      }
+    if (!token) {
+      return errorResponse(res, "Reset token is required.", {}, 400);
+    }
 
-      const user = await User.findOne({
-          resetPasswordToken: token,
-          resetPasswordExpires: { $gt: Date.now() } 
-      });
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
 
-      if (!user) {
-          return res.status(400).json({ message: "Invalid or expired reset token." });
-      }
+    if (!user) {
+      return errorResponse(res, "Invalid or expired reset token.", {}, 400);
+    }
 
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword, salt);
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
 
-      user.resetPasswordToken = null;
-      user.resetPasswordExpires = null;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
 
-      await user.save();
+    await user.save();
 
-      res.status(200).json({ message: "Password reset successful. You can now log in with your new password." });
+    // Send success response
+    return successResponse(res, "Password reset link sent successfully. Check your email.", {}, 200);
 
   } catch (error) {
-      console.error("Error resetting password:", error);
-      res.status(500).json({ message: "Internal server error" });
+    console.error("Error resetting password:", error);
+    // Send error response in case of failure
+    return errorResponse(res, "Internal Server Error", { message: error.message }, 500);
   }
 };
 
 
 exports.confirmEmail = async (req, res) => {
   const { token } = req.body;
-  
+
   if (!token) {
-    return res.status(400).json({ message: "Invalid or missing token" });
+    return errorResponse(res, "Invalid or missing token", {}, 400);
   }
 
   try {
@@ -193,11 +208,11 @@ exports.confirmEmail = async (req, res) => {
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(res, "User not found", {}, 404);
     }
 
     if (user.isEmailConfirmed) {
-      return res.status(400).json({ message: "Email already confirmed" });
+      return errorResponse(res, "Email already confirmed", {}, 400);
     }
 
     // Confirm the email
@@ -205,11 +220,13 @@ exports.confirmEmail = async (req, res) => {
     user.emailConfirmationToken = null;
     await user.save();
 
-    res.status(200).json({ message: "Email confirmed successfully!" });
+    // Send success response
+    return successResponse(res, "Email confirmed successfully!", {}, 200);
 
   } catch (error) {
     console.error("Email confirmation error:", error);
-    res.status(500).json({ message: "Invalid or expired token" });
+    // Send error response in case of invalid or expired token
+    return errorResponse(res, "Invalid or expired token", { message: error.message }, 400);
   }
 };
 
@@ -221,24 +238,22 @@ exports.googleAuth = (req, res, next) => {
 // Google OAuth Callback
 exports.googleAuthCallback = async (req, res) => {
   try {
-      const user = req.user; // Retrieved from Passport authentication
+    const user = req.user; // Retrieved from Passport authentication
 
-      if (!user) {
-          return res.status(401).json({ message: "Google authentication failed" });
-      }
+    if (!user) {
+      return errorResponse(res, "Google authentication failed", {}, 401);
+    }
 
-      // Generate a JWT token
-      const token = generateJWTToken({ userId: user._id, fullName: user.fullName });
+    // Generate a JWT token
+    const token = generateJWTToken({ userId: user._id, fullName: user.fullName });
 
-      res.status(200).json({
-          message: "Google login successful",
-          token,
-          user: userDTO(user),
-      });
+    // Return success response
+    return successResponse(res, "Google login successful", { token, user: userDTO(user) }, 200);
 
   } catch (error) {
-      console.error("Google login error:", error);
-      res.status(500).json({ message: "Internal server error" });
+    console.error("Google login error:", error);
+    // Return error response for any issues
+    return errorResponse(res, "Internal server error", { message: error.message }, 500);
   }
 };
 
@@ -254,27 +269,26 @@ exports.githubAuthCallback = async (req, res) => {
     const user = req.user; // Retrieved from Passport GitHub strategy
 
     if (!user) {
-      return res.status(401).json({ message: "GitHub authentication failed" });
+      return errorResponse(res, "GitHub authentication failed", {}, 401);
     }
 
     const token = generateJWTToken({ userId: user._id, fullName: user.fullName });
 
-    res.status(200).json({
-      message: "GitHub login successful",
-      token,
-      user: userDTO(user),
-    });
+    // Return success response
+    return successResponse(res, "GitHub login successful", { token, user: userDTO(user) }, 200);
+
   } catch (error) {
     console.error("GitHub login error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    // Return error response for any issues
+    return errorResponse(res, "Internal server error", { message: error.message }, 500);
   }
 };
 
 exports.oauthAuthFailure = (req, res) => {
-    // You can send specific details about the failure
-    const errorMessage = req.query.error_description || "OAuth authentication was canceled by the user.";
-  
-    // Redirect to frontend with the error message
-    const failureRedirect = `http://localhost:5173/login-failed?error=true&message=${encodeURIComponent(errorMessage)}`;
-    res.redirect(failureRedirect);
+  // You can send specific details about the failure
+  const errorMessage = req.query.error_description || "OAuth authentication was canceled by the user.";
+
+  // Redirect to frontend with the error message
+  const failureRedirect = `http://localhost:5173/login-failed?error=true&message=${encodeURIComponent(errorMessage)}`;
+  res.redirect(failureRedirect);
 };

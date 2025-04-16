@@ -1,22 +1,24 @@
-// Success response
-const successResponse = (res, message, data = {}, code = 200) => {
-    res.status(code).json({
-      status: "success",
-      code,
-      message,
-      data
-    });
-  };
-  
-  // Error response
-  const errorResponse = (res, message, errorDetails = {}, code = 400) => {
-    res.status(code).json({
-      status: "error",
-      code,
-      message,
-      error: errorDetails
-    });
-  };
-  
+const successResponse = (res, message, data = {}, statusCode = 200, meta = null) => {
+  return res.status(statusCode).json({
+    status: "success",
+    code: statusCode,
+    message,
+    data,
+    meta,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+const errorResponse = (res, message, error = {}, statusCode = 500, path = null) => {
+  return res.status(statusCode).json({
+    status: "error",
+    code: statusCode,
+    message,
+    error,
+    path,
+    timestamp: new Date().toISOString(),
+  });
+};
+
   module.exports = { successResponse, errorResponse };
   
