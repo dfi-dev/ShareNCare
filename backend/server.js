@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 
 
 const authRoutes = require("./routes/authRoutes");
-const donationRoutes = require("./routes/donationRoutes");
+const generalDonationRoutes = require("./routes/generalDonationRoutes");
 const bloodDonationRoutes = require("./routes/bloodDonationRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -38,7 +38,7 @@ const otpRoutes = require('./routes/otpRoutes');
 const statsRoutes = require('./routes/statsRoutes');  
 
 app.use("/api/auth", authRoutes);
-app.use("/api/donations", donationRoutes);
+app.use("/api/general-donations", generalDonationRoutes);
 app.use("/api/blood-donations", bloodDonationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/users", userRoutes);

@@ -1,0 +1,61 @@
+✅ We Need to Create More Middleware as Follows:
+
+1. authMiddleware
+
+Purpose: Verify JWT and attach req.user
+
+Applied In: All protected routes
+
+2. roleMiddleware (optional)
+
+Purpose: Restrict access based on user role (admin, donor, recipient)
+
+Applied In: Specific routes (e.g., admin-only or donor-only)
+
+3. validateRequestBody (optional)
+
+Purpose: Validate request body format and fields
+
+Applied In: create / update routes
+
+4. errorHandler
+
+Purpose: Central error handling
+
+Applied In: Global (after all routes)
+
+5. requestLogger
+
+Purpose: Log requests and status codes
+
+Applied In: Global or during development
+
+6. socketAuthMiddleware (if using sockets)
+
+Purpose: Authenticate socket connections
+
+Applied In: In socket.io server setup
+
+7. cors
+
+Purpose: Handle cross-origin requests
+
+Applied In: Global
+
+8. rateLimiter (optional)
+
+Purpose: Limit requests per IP
+
+Applied In: Auth routes (login/signup), public APIs
+
+9. express.json() / express.urlencoded()
+
+Purpose: Parse JSON/form body
+
+Applied In: Global
+
+10. sanitizeInput (optional)
+
+Purpose: Prevent XSS or NoSQL injection
+
+Applied In: On input-heavy routes

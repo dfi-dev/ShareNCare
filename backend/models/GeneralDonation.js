@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const donationSchema = new mongoose.Schema(
+const generalDonationSchema = new mongoose.Schema(
   {
     donor: { type: mongoose.Schema.Types.Mixed, ref: "User", required: true }, 
     recipient: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
@@ -22,6 +22,6 @@ const donationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Donation = mongoose.models.Donation || mongoose.model("Donation", donationSchema);
+const GeneralDonation = mongoose.models.GeneralDonation || mongoose.model("GeneralDonation", generalDonationSchema);
 
-module.exports = Donation;
+module.exports = GeneralDonation;

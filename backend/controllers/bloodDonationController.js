@@ -2,6 +2,7 @@ const BloodDonation = require("../models/BloodDonation");
 const RecipientBloodRequest = require("../models/RecipientBloodRequest");
 const sendNotification = require("../utils/sendNotification");
 const emitEvent = require('../socket/emitEvent')
+const { successResponse, errorResponse } = require('../utils/responseHelper.js');
 
 
 
@@ -12,11 +13,11 @@ exports.createBloodDonation = async (req, res) => {
     const { bloodGroup, lastDonationDate, weight, medicalConditions, recentSurgeries, consent } = req.body;
 
     if (!bloodGroup || !weight || consent === undefined) {
-      return res.status(400).json({ message: "Blood group, weight, and consent are required" });
+      return errorResponse(res, "Blood group, weight, and consent are required", {}, 400);
     }
 
     if (req.user.role !== "donor") {
-      return res.status(403).json({ message: "Only donors can submit a blood donation" });
+      return errorResponse(res, "Only donors can submit a blood donation", {}, 403);
     }
 
     const bloodDonation = new BloodDonation({
@@ -30,15 +31,15 @@ exports.createBloodDonation = async (req, res) => {
     });
 
     await bloodDonation.save();
-    
-    emitEvent(req.io, {roles:["recipient"]}, "updateBloodDonations", bloodDonation);
-    const bloodDonations = await BloodDonation.countDocuments({ status: 'completed' });
-    emitEvent(req.io, "all", "updateStats", { bloodDonations });
+
+    // emitEvent(req.io, { roles: ["recipient"] }, "updateBloodDonations", bloodDonation);
+    // const bloodDonations = await BloodDonation.countDocuments({ status: 'completed' });
+    // emitEvent(req.io, "all", "updateStats", { bloodDonations });
 
 
-    res.status(201).json({ message: "Blood donation request submitted", bloodDonation });
+    return successResponse(res, "Blood donation submitted", { bloodDonation }, 201);
   } catch (err) {
-    res.status(500).json({ message: "Failed to submit request", error: err.message });
+    return errorResponse(res, "Failed to submit blood donation", { message: err.message }, 500);
   }
 };
 
@@ -51,13 +52,12 @@ exports.requestBlood = async (req, res) => {
   try {
     const { bloodDonationId, urgencyLevel, message } = req.body;
 
-    // ✅ Ensure required fields are provided
     if (!bloodDonationId || !urgencyLevel) {
-      return res.status(400).json({ message: "Blood donation ID and urgency level are required" });
+      return errorResponse(res, "Blood donation ID and urgency level are required", {}, 400);
     }
 
     if (req.user.role !== "recipient") {
-      return res.status(403).json({ message: "Only recipients can request blood" });
+      return errorResponse(res, "Only recipients can request blood", {}, 403);
     }
 
     const bloodRequest = new RecipientBloodRequest({
@@ -65,27 +65,28 @@ exports.requestBlood = async (req, res) => {
       recipient: req.user.id,
       urgencyLevel,
       status: "pending",
-      message: message || "",  // Optional message
+      message: message || "", 
     });
 
     await bloodRequest.save();
 
-    req.io.emit("newBloodRequest", { bloodRequest });
+    // req.io.emit("newBloodRequest", { bloodRequest });
 
-    await sendNotification(
-      {
-        target: "donor",
-        excludeUser: req.user.id
-      },
-      
-      "New Blood Request Created",
-      "A new blood donation request has been submitted. Please review.",
-      req.io
-    );
+    // await sendNotification(
+    //   {
+    //     target: "donor",
+    //     excludeUser: req.user.id
+    //   },
 
-    res.status(201).json({ message: "Blood request submitted successfully", bloodRequest });
+    //   "New Blood Request Created",
+    //   "A new blood donation request has been submitted. Please review.",
+    //   req.io
+    // );
+
+    return successResponse(res, "Blood request submitted successfully", { bloodRequest }, 201);
   } catch (err) {
-    res.status(500).json({ message: "Failed to submit blood request", error: err.message });
+    console.error("Blood request error:", err);
+    return errorResponse(res, "Failed to submit blood request", { message: err.message }, 500);
   }
 };
 
@@ -93,22 +94,24 @@ exports.requestBlood = async (req, res) => {
 exports.getAllBloodDonations = async (req, res) => {
   try {
     const bloodDonations = await BloodDonation.find().populate("donor", "fullName email");
-    res.json(bloodDonations);
+    return successResponse(res, "Blood donations retrieved successfully", { bloodDonations }, 200);
   } catch (err) {
-    res.status(500).json({ message: "Failed to retrieve blood donations", error: err.message });
+    console.error("Failed to retrieve blood donations:", err);
+    return errorResponse(res, "Failed to retrieve blood donations", { message: err.message }, 500);
   }
 };
 
 
 exports.getAvailableBloodDonations = async (req, res) => {
   try {
+    if (req.user.role !== "recipient") {
+      return errorResponse(res, "Only recipients can view available blood donations", {}, 403);
+    }
     const availableBloodDonations = await BloodDonation.find({ status: "approved" }).populate("donor", "fullName email");
-    res.json(availableBloodDonations);
+    return successResponse(res, "Available blood donations retrieved successfully", { availableBloodDonations }, 200);
   } catch (err) {
-    res.status(500).json({ 
-      message: "Failed to retrieve available blood donations", 
-      error: err.message 
-    });
+    console.error("Failed to retrieve available blood donations:", err);
+    return errorResponse(res, "Failed to retrieve available blood donations", { message: err.message }, 500);
   }
 };
 
@@ -116,13 +119,14 @@ exports.getAvailableBloodDonations = async (req, res) => {
 exports.getUserBloodDonations = async (req, res) => {
   try {
     if (req.user.role !== "donor") {
-      return res.status(403).json({ message: "Only donors can view their blood donations" });
+      return errorResponse(res, "Only donors can view their blood donations", {}, 403);
     }
 
     const userDonations = await BloodDonation.find({ donor: req.user.id });
-    res.json(userDonations);
+    return successResponse(res, "User blood donations retrieved successfully", { userDonations }, 200);
   } catch (err) {
-    res.status(500).json({ message: "Failed to retrieve your donations", error: err.message });
+    console.error("Error fetching user blood donations:", err);
+    return errorResponse(res, "Failed to retrieve user donations", { message: err.message }, 500);
   }
 };
 
@@ -134,13 +138,14 @@ exports.getUserBloodDonations = async (req, res) => {
 exports.getBloodRequests = async (req, res) => {
   try {
     if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Only admins can view blood requests" });
+      return errorResponse(res, "Only admins can view blood requests", {}, 403);
     }
-
+    // why checking in bloodDonationSchema?
     const bloodRequests = await BloodDonation.find({ recipient: { $ne: null } }).populate("recipient", "fullName email");
-    res.json(bloodRequests);
+    return successResponse(res, "Blood requests retrieved successfully", { bloodRequests }, 200);
   } catch (err) {
-    res.status(500).json({ message: "Failed to retrieve blood requests", error: err.message });
+    console.error("Error fetching blood requests:", err);
+    return errorResponse(res, "Failed to retrieve blood requests", { message: err.message }, 500);
   }
 };
 
@@ -151,11 +156,11 @@ exports.updateBloodDonation = async (req, res) => {
 
     const bloodDonation = await BloodDonation.findById(donationId);
     if (!bloodDonation) {
-      return res.status(404).json({ message: "Blood donation not found" });
+      return errorResponse(res, "Blood donation not found", {}, 404);
     }
 
     if (bloodDonation.donor.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You can only update your own blood donations" });
+      return errorResponse(res, "You can only update your own blood donations", {}, 403);
     }
 
 
@@ -168,15 +173,16 @@ exports.updateBloodDonation = async (req, res) => {
 
     await bloodDonation.save();
 
-    // ✅ Emit real-time event
-    req.io.emit("bloodDonationUpdated", { donationId: bloodDonation._id, bloodDonation });
+    // // ✅ Emit real-time event
+    // req.io.emit("bloodDonationUpdated", { donationId: bloodDonation._id, bloodDonation });
 
-    // ✅ Send notification to the donor
-    await sendNotification(req.io, bloodDonation.donor, "Your blood donation details have been updated.");
+    // // ✅ Send notification to the donor
+    // await sendNotification(req.io, bloodDonation.donor, "Your blood donation details have been updated.");
 
-    res.json({ message: "Blood donation updated successfully", bloodDonation });
+    return successResponse(res, "Blood donation updated successfully", { bloodDonation });
   } catch (err) {
-    res.status(500).json({ message: "Failed to update blood donation", error: err.message });
+    console.error("Update blood donation error:", err);
+    return errorResponse(res, "Failed to update blood donation", { message: err.message });
   }
 };
 
@@ -186,61 +192,25 @@ exports.deleteBloodDonation = async (req, res) => {
 
     const bloodDonation = await BloodDonation.findById(donationId);
     if (!bloodDonation) {
-      return res.status(404).json({ message: "Blood donation not found" });
+      return errorResponse(res, "Blood donation not found", {}, 404);
     }
 
     if (bloodDonation.donor.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You can only delete your own blood donations" });
+      return errorResponse(res, "You can only delete your own blood donations", {}, 403);
     }
 
     await bloodDonation.deleteOne();
 
-    req.io.emit("bloodDonationDeleted", { donationId });
+    // req.io.emit("bloodDonationDeleted", { donationId });
 
-    await sendNotification(req.io, bloodDonation.donor, "Your blood donation has been deleted.");
+    // await sendNotification(req.io, bloodDonation.donor, "Your blood donation has been deleted.");
 
-    res.json({ message: "Blood donation deleted successfully" });
+    return successResponse(res, "Blood donation deleted successfully");
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete blood donation", error: err.message });
+    console.error("Delete blood donation error:", err);
+    return errorResponse(res, "Failed to delete blood donation", { message: err.message });
   }
 };
-
-exports.updateBloodDonation = async (req, res) => {
-  try {
-    const { donationId } = req.params;
-    const { bloodGroup, lastDonationDate, weight, medicalConditions, recentSurgeries, consent } = req.body;
-
-    const bloodDonation = await BloodDonation.findById(donationId);
-    if (!bloodDonation) {
-      return res.status(404).json({ message: "Blood donation not found" });
-    }
-
-
-    if (bloodDonation.donor.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You can only update your own blood donations" });
-    }
-
-    if (bloodGroup) bloodDonation.bloodGroup = bloodGroup;
-    if (lastDonationDate) bloodDonation.lastDonationDate = lastDonationDate;
-    if (weight) bloodDonation.weight = weight;
-    if (medicalConditions) bloodDonation.medicalConditions = medicalConditions;
-    if (recentSurgeries) bloodDonation.recentSurgeries = recentSurgeries;
-    if (consent !== undefined) bloodDonation.consent = consent;
-
-    await bloodDonation.save();
-
-    // ✅ Emit real-time event
-    req.io.emit("bloodDonationUpdated", { donationId: bloodDonation._id, bloodDonation });
-
-    // ✅ Send notification to the donor
-    await sendNotification(req.io, bloodDonation.donor, "Your blood donation details have been updated.");
-
-    res.json({ message: "Blood donation updated successfully", bloodDonation });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to update blood donation", error: err.message });
-  }
-};
-
 
 exports.updateBloodDonationStatus = async (req, res) => {
   try {
@@ -248,33 +218,34 @@ exports.updateBloodDonationStatus = async (req, res) => {
     const { status } = req.body;
 
     if (!["pending", "completed"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
+      return errorResponse(res, "Invalid status", {}, 400);
     }
 
     const bloodDonation = await BloodDonation.findById(donationId);
     if (!bloodDonation) {
-      return res.status(404).json({ message: "Blood donation not found" });
+      return errorResponse(res, "Blood donation not found", {}, 404);
     }
 
     // Only admin can change the status
     if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Only admins can update blood donation status" });
+      return errorResponse(res, "Only admins can update blood donation status", {}, 403);
     }
 
     bloodDonation.status = status;
     await bloodDonation.save();
 
-    // ✅ Emit real-time event
-    req.io.emit("bloodDonationStatusUpdated", {
-      donationId: bloodDonation._id,
-      status: bloodDonation.status,
-    });
+    // // ✅ Emit real-time event
+    // req.io.emit("bloodDonationStatusUpdated", {
+    //   donationId: bloodDonation._id,
+    //   status: bloodDonation.status,
+    // });
 
-    // ✅ Send notification to the donor
-    await sendNotification(req.io, bloodDonation.donor, `Your blood donation status is now ${status}`);
+    // // ✅ Send notification to the donor
+    // await sendNotification(req.io, bloodDonation.donor, `Your blood donation status is now ${status}`);
 
-    res.json({ message: "Blood donation status updated successfully", bloodDonation });
+    return successResponse(res, "Blood donation status updated successfully", bloodDonation);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update blood donation status", error: err.message });
+    console.error("Failed to update blood donation status:", err);
+    return errorResponse(res, "Failed to update blood donation status", { message: err.message });
   }
 };

@@ -2,13 +2,15 @@ const { generateOTP, storeOTP, verifyOTP } = require('../services/otpService');
 const sendEmail = require("../utils/sendEmail");
 const getEmailTemplate = require("../templates/emailTemplate");
 const emailContent = require("../templates/emailContent");
+const { successResponse, errorResponse } = require('../utils/responseHelper.js');
+
 
 // Send OTP
 exports.sendOTP = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
+        return errorResponse(res, 'Email is required', {}, 400);
     }
 
     try {
@@ -29,7 +31,7 @@ exports.sendOTP = async (req, res) => {
             otpHTML
         );
 
-        res.status(200).json({ message: 'OTP sent successfully!' });
+        return successResponse(res, 'OTP sent successfully!', {}, 200);
 
     } catch (error) {
         console.error("Error sending OTP:", error);
@@ -43,19 +45,19 @@ exports.verifyOTP = async (req, res) => {
     const { email, otp } = req.body;
 
     if (!email || !otp) {
-        return res.status(400).json({ error: 'Email and OTP are required' });
+        return errorResponse(res, 'Email and OTP are required', {}, 400);
     }
 
     try {
         const isValid = await verifyOTP(email, otp);
 
         if (isValid) {
-            res.status(200).json({ message: 'OTP verified successfully!' });
+            return successResponse(res, 'OTP verified successfully!', {}, 200);
         } else {
-            res.status(400).json({ error: 'Invalid or expired OTP' });
+            return errorResponse(res, 'Invalid or expired OTP', {}, 400);
         }
     } catch (error) {
         console.error("Error verifying OTP:", error);
-        res.status(500).json({ error: "Failed to verify OTP" });
+        return errorResponse(res, "Failed to verify OTP", { error: error.message }, 500);
     }
 };
