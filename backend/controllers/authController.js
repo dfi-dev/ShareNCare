@@ -44,7 +44,7 @@ exports.signup = async (req, res) => {
 
     // Send confirmation email
     const confirmationLink = `${process.env.FRONTEND_URL || "www.example.com"}/confirm-email?token=${emailConfirmationToken}`;
-
+    
     const confirmationHTML = getEmailTemplate(
       newUser.fullName,
       emailContent.CONFIRM_EMAIL.title,
