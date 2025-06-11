@@ -118,7 +118,7 @@ class AuthController extends Controller
                 'role' => 'Admin',
             ];
 
-            Mail::to($data['email'])->send(new CompanyWelcomeMail($data));
+            //Mail::to($data['email'])->send(new CompanyWelcomeMail($data));
 
             return new UserResource($user);
         } catch (\Exception $exp) {

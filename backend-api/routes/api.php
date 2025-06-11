@@ -66,8 +66,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
         // 📌 Job Applications Routes
         Route::prefix('job-applications')->group(function () {
             // 🔽 Core Application actions
-            Route::post('/', [JobApplicationController::class, 'applyForJob']); // Apply to a job (creates candidate + application)
+           
             Route::get('/', [JobApplicationController::class, 'getApplications']); // Admin view of all applications
+            Route::post('/', [JobApplicationController::class, 'applyForJob']); // Apply to a job (creates candidate + application)
             Route::get('/stats', [JobApplicationStatsController::class, 'getApplicationCountsByStage']);
             // 🔽 Filtered applications by job_post_id
             Route::get('/job/{jobPostId}', [JobApplicationController::class, 'getApplicationsForJob']);
