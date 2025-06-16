@@ -23,14 +23,14 @@ class JobApplicationController extends Controller
     public function applyForJob(Request $request)
     {
         $user = Auth::user();
-    
+
         if (!$user || !$user->company_id) {
             return response()->json([
                 "status" => "error",
                 "message" => "Unauthorized or invalid company."
             ], 403);
         }
-    
+
         // Validate request
         $validated = $request->validate([
             // Candidate fields
@@ -52,7 +52,7 @@ class JobApplicationController extends Controller
             'job_id' => 'required|exists:job_posts,id',
             'status' => 'nullable|in:Active,Rejected',
         ]);
-    
+
         // Ensure the job post belongs to the same company
         $job = JobPost::find($validated['job_id']);
         if (!$job || $job->company_id !== $user->company_id) {
@@ -61,10 +61,10 @@ class JobApplicationController extends Controller
                 "message" => "Unauthorized: You cannot apply for jobs outside your company."
             ], 403);
         }
-    
+
         // Enforce company_id
         $validated['company_id'] = $user->company_id;
-    
+
         // Handle profile pic
         if ($request->hasFile('profile_pic')) {
             $validated['profile_pic'] = $request->file('profile_pic')->storeAs(
@@ -73,7 +73,7 @@ class JobApplicationController extends Controller
                 'private'
             );
         }
-    
+
         // Handle resume
         if ($request->hasFile('resume')) {
             $validated['resume'] = $request->file('resume')->storeAs(
@@ -82,24 +82,24 @@ class JobApplicationController extends Controller
                 'private'
             );
         }
-    
+
         // Create candidate
         $candidate = Candidate::create($validated);
-    
+
         // Create application
         $application = CandidateApplication::create([
             'candidate_id' => $candidate->id,
             'job_post_id' => $validated['job_id'],
             // 'status' => $validated['status'] ?? 'Active',
         ]);
-    
+
         return $this->successResponse(
             new JobApplicationResource($application),
             'Job application submitted successfully',
             201
         );
     }
-    
+
 
     public function updateCandidateApplication(Request $request, $applicationId)
     {
@@ -194,16 +194,16 @@ class JobApplicationController extends Controller
     {
         $user = Auth::user();
 
-    if (!$user || !$user->company_id) {
-        return response()->json(['status' => 'error', 'message' => 'Unauthorized or company not set'], 403);
-    }
+        if (!$user || !$user->company_id) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized or company not set'], 403);
+        }
 
-       // Only get applications where candidate belongs to user's company
-    $applications = CandidateApplication::with(['candidate', 'jobPost'])
-        ->whereHas('candidate', function ($query) use ($user) {
-            $query->where('company_id', $user->company_id);
-        })
-        ->get();
+        // Only get applications where candidate belongs to user's company
+        $applications = CandidateApplication::with(['candidate', 'jobPost'])
+            ->whereHas('candidate', function ($query) use ($user) {
+                $query->where('company_id', $user->company_id);
+            })
+            ->get();
 
         // Reusable closure for file URL generation
         $generateFileUrl = function (?string $filePath) {
@@ -281,32 +281,32 @@ class JobApplicationController extends Controller
     public function getApplicationById($applicationId)
     {
         $user = Auth::user();
-    
+
         if (!$user || !$user->company_id) {
             return response()->json(['status' => 'error', 'message' => 'Unauthorized or company not set'], 403);
         }
-    
+
         $application = CandidateApplication::with(['candidate', 'jobPost.company'])->find($applicationId);
-    
+
         if (!$application) {
             return response()->json(['status' => 'error', 'message' => 'Application not found'], 404);
         }
-    
+
         // Check if candidate's company matches the authenticated user's company
         if ($application->candidate->company_id !== $user->company_id) {
             return response()->json(['status' => 'error', 'message' => 'Access denied'], 403);
         }
-    
+
         $candidate = $application->candidate;
-    
+
         // Helper to generate file URLs
         $generateFileUrl = function (?string $filePath) {
             if (!$filePath) return null;
-    
+
             $encodedPath = implode('/', array_map('rawurlencode', explode('/', $filePath)));
             return url('api/v.1/files/' . $encodedPath);
         };
-    
+
         $formattedApplication = [
             'id' => $application->id,
             'candidate_id' => $application->candidate_id,
@@ -362,10 +362,10 @@ class JobApplicationController extends Controller
                 'updated_at' => $application->jobPost->updated_at->toIso8601String(),
             ]
         ];
-    
+
         return $this->successResponse($formattedApplication, 'Application fetched successfully');
     }
-    
+
 
 
 
@@ -446,108 +446,107 @@ class JobApplicationController extends Controller
     // }
 
 
-public function getApplicationsForJob(Request $request, $jobPostId)
-{
-    $user = Auth::user();
+    public function getApplicationsForJob(Request $request, $jobPostId)
+    {
+        $user = Auth::user();
 
-    // Restrict access to only jobs belonging to the user's company
-    $job = JobPost::findOrFail($jobPostId);
-    if ($job->company_id !== $user->company_id) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Unauthorized access to this job\'s applications.'
-        ], 403);
-    }
+        // Restrict access to only jobs belonging to the user's company
+        $job = JobPost::findOrFail($jobPostId);
+        if ($job->company_id !== $user->company_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized access to this job\'s applications.'
+            ], 403);
+        }
 
-    $query = CandidateApplication::with(['candidate'])
-        ->where('job_post_id', $jobPostId)
-        ->where('status', 'Active');
+        $query = CandidateApplication::with(['candidate'])
+            ->where('job_post_id', $jobPostId)
+            ->where('status', 'Active');
 
-    if ($request->filled('location')) {
-        $query->whereHas('candidate', fn($q) => $q->where('location', 'like', '%' . $request->location . '%'));
-    }
+        if ($request->filled('location')) {
+            $query->whereHas('candidate', fn($q) => $q->where('location', 'like', '%' . $request->location . '%'));
+        }
 
-    if ($request->filled('experience_min')) {
-        $query->whereHas('candidate', fn($q) => $q->where('experience', '>=', $request->experience_min));
-    }
+        if ($request->filled('experience_min')) {
+            $query->whereHas('candidate', fn($q) => $q->where('experience', '>=', $request->experience_min));
+        }
 
-    if ($request->filled('experience_max')) {
-        $query->whereHas('candidate', fn($q) => $q->where('experience', '<=', $request->experience_max));
-    }
+        if ($request->filled('experience_max')) {
+            $query->whereHas('candidate', fn($q) => $q->where('experience', '<=', $request->experience_max));
+        }
 
-    if ($request->filled('search')) {
-        $query->whereHas('candidate', function ($q) use ($request) {
-            $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $request->search . '%'])
-                ->orWhere('email', 'like', '%' . $request->search . '%')
-                ->orWhere('designation', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $query->whereHas('candidate', function ($q) use ($request) {
+                $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ['%' . $request->search . '%'])
+                    ->orWhere('email', 'like', '%' . $request->search . '%')
+                    ->orWhere('designation', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $page = max(1, (int) $request->get('page', 1));
+        $applications = $query->latest()->paginate(10, ['*'], 'page', $page);
+
+        if ($page > $applications->lastPage()) {
+            return response()->json([
+                'job' => $job,
+                'job_applications' => [],
+                'candidates' => [],
+                'pagination' => [
+                    'current_page' => $page,
+                    'last_page' => $applications->lastPage(),
+                    'per_page' => $applications->perPage(),
+                    'total' => $applications->total(),
+                ],
+            ]);
+        }
+
+        $generateFileUrl = function (?string $filePath) {
+            if (!$filePath) return null;
+            $encodedPath = implode('/', array_map('rawurlencode', explode('/', $filePath)));
+            return url('api/v.1/files/' . $encodedPath);
+        };
+
+        $job_application = collect($applications->items())->map(fn($app) => [
+            'id' => $app->id,
+            'applied_at' => $app->applied_at,
+            'status' => $app->status,
+            'stage_id' => $app->stage_id,
+        ]);
+
+        $candidates = collect($applications->items())->map(function ($app) use ($generateFileUrl) {
+            $candidate = $app->candidate;
+            return [
+                'id' => $candidate->id,
+                'company_id' => $candidate->company_id,
+                'first_name' => $candidate->first_name,
+                'last_name' => $candidate->last_name,
+                'designation' => $candidate->designation,
+                'experience' => $candidate->experience,
+                'education' => $candidate->education,
+                'phone' => $candidate->phone,
+                'email' => $candidate->email,
+                'country' => $candidate->country,
+                'location' => $candidate->location,
+                'current_ctc' => $candidate->current_ctc,
+                'expected_ctc' => $candidate->expected_ctc,
+                'profile_pic' => $generateFileUrl($candidate->profile_pic),
+                'resume' => $generateFileUrl($candidate->resume),
+                'source_id' => $candidate->source_id,
+                'created_at' => $candidate->created_at->toIso8601String(),
+                'updated_at' => $candidate->updated_at->toIso8601String(),
+            ];
         });
-    }
 
-    $page = max(1, (int) $request->get('page', 1));
-    $applications = $query->latest()->paginate(10, ['*'], 'page', $page);
-
-    if ($page > $applications->lastPage()) {
         return response()->json([
             'job' => $job,
-            'job_applications' => [],
-            'candidates' => [],
+            'job_application' => $job_application,
+            'candidates' => $candidates,
             'pagination' => [
-                'current_page' => $page,
+                'current_page' => $applications->currentPage(),
                 'last_page' => $applications->lastPage(),
                 'per_page' => $applications->perPage(),
                 'total' => $applications->total(),
             ],
         ]);
     }
-
-    $generateFileUrl = function (?string $filePath) {
-        if (!$filePath) return null;
-        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $filePath)));
-        return url('api/v.1/files/' . $encodedPath);
-    };
-
-    $job_application = collect($applications->items())->map(fn($app) => [
-        'id' => $app->id,
-        'applied_at' => $app->applied_at,
-        'status' => $app->status,
-        'stage_id' => $app->stage_id,
-    ]);
-
-    $candidates = collect($applications->items())->map(function ($app) use ($generateFileUrl) {
-        $candidate = $app->candidate;
-        return [
-            'id' => $candidate->id,
-            'company_id' => $candidate->company_id,
-            'first_name' => $candidate->first_name,
-            'last_name' => $candidate->last_name,
-            'designation' => $candidate->designation,
-            'experience' => $candidate->experience,
-            'education' => $candidate->education,
-            'phone' => $candidate->phone,
-            'email' => $candidate->email,
-            'country' => $candidate->country,
-            'location' => $candidate->location,
-            'current_ctc' => $candidate->current_ctc,
-            'expected_ctc' => $candidate->expected_ctc,
-            'profile_pic' => $generateFileUrl($candidate->profile_pic),
-            'resume' => $generateFileUrl($candidate->resume),
-            'source_id' => $candidate->source_id,
-            'created_at' => $candidate->created_at->toIso8601String(),
-            'updated_at' => $candidate->updated_at->toIso8601String(),
-        ];
-    });
-
-    return response()->json([
-        'job' => $job,
-        'job_application' => $job_application,
-        'candidates' => $candidates,
-        'pagination' => [
-            'current_page' => $applications->currentPage(),
-            'last_page' => $applications->lastPage(),
-            'per_page' => $applications->perPage(),
-            'total' => $applications->total(),
-        ],
-    ]);
-}
-
 }

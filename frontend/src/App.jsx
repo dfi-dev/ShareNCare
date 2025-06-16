@@ -1,47 +1,59 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Footer from "./components/Layout/Footer.jsx";
-import PublicHeader from "./components/Layout/PublicHeader.jsx";
-import Welcome from "./pages/public/Welcome.jsx";
-import About from "./pages/public/About.jsx";
-import Contact from "./pages/public/Contact.jsx";
-import TopDonors from "./pages/public//TopDonors.jsx";
-import Donate from "./pages/public/Donate.jsx";
-import LoginPage from "./pages/public/LoginPage.jsx";
-import SignupPage from "./pages/public/SignupPage.jsx";
-import ConfirmEmailPage from './pages/public/ConfirmEmailPage.jsx';
-import NotFoundPage from './pages/public/NotFoundPage.jsx';
-import DonorLanding from './pages/donor/DonorLanding.jsx';
+import { Routes, Route } from "react-router-dom";
+import { Suspense } from "react";
+import './App.css'
+import Dashboard from "./Dashboard/Pages/Dashboard";
+import ScrollToTop from "./Components/ScrollToTop";
+import Jobs from "./Dashboard/Pages/Jobs/Jobs";
+import DashboardLayout from "./Dashboard/DashboardLayout";
+import Employee from "./Dashboard/Pages/Employee/Employee"
+import CreateProfile from "./Dashboard/Pages/Employee/CreateProfile"
+import ViewProfile from "./Dashboard/Pages/Employee/ViewProfile"
+import NotFound from "./Pages/NotFoundPage";
+import Candidate from "./Dashboard/Pages/Candidates/Candidates";
+import FindCandidates from "./Dashboard/Pages/Candidates/FindCandidates";
+import CandidateProfile from "./Dashboard/Pages/Candidates/CandidateProfile";
+import JobPreview from "./Dashboard/Pages/Jobs/JobPreview";
+import ProfilePage from "./Dashboard/Pages/ProfilePage";
+import SettingsLayout from "./Dashboard/Pages/SettingsLayout";
 
-const App = () => {
-    const location = useLocation();
 
-    // Hide header and footer on login, signup, and OTP pages
-    const hideHeaderFooter = ['/login', '/signup', '/otp'].includes(location.pathname);
+function App() {
 
-    return (
-        <div className="min-h-screen flex flex-col">
-            {!hideHeaderFooter && <PublicHeader />}
+  return (
+    <>
+      <Suspense fallback={<div className="loading">Loading...</div>}>
+        <ScrollToTop />
+        <Routes>
+          {/* Protected Routes inside Layout */}
+          <Route path="/" element={<DashboardLayout />}>
+            {/* Dashboard Home */}
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard/profile" element={<ProfilePage />} />
+            <Route path="dashboard/settings" element={<SettingsLayout />} />
+            {/* Jobs Management */}
+            <Route path="jobs" element={<Jobs />} />
+            <Route path="jobs/overview/:id" element={<JobPreview />} />
+            <Route path="jobs/:jobId/candidates" element={<FindCandidates />} />
+            {/* Employees Management */}
+            <Route path="employees" element={<Employee />} />
+            <Route path="dashboard/employee/new" element={<CreateProfile />} />
+            <Route path="dashboard/employee/:employeeId/edit" element={<CreateProfile />} />
+            <Route path="dashboard/employee/:id/view" element={<ViewProfile />} />
+            <Route path="candidates" element={<Candidate />} />
+            <Route path="candidates/profile/:id" element={<CandidateProfile />} />
+          </Route>
 
-            <main className="flex-grow">
-                <Routes>
-                    <Route path="/" element={<Welcome />} /> 
-                    <Route path="/donate" element={<Donate />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/top-donors" element={<TopDonors />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/confirm-email" element={<ConfirmEmailPage />} />
-                    <Route path="/donor/dashboard" element={<DonorLanding />} />
+          {/* Catch-all route for 404 page */}
+          <Route path="*" element={<NotFound />} />
 
-                    {/* 404 Not Found Route */}
-                    <Route path="*" element={<NotFoundPage/>} />
-                </Routes>
-            </main>
+        </Routes>
+      </Suspense>
 
-            {!hideHeaderFooter && <Footer />}
-        </div>
-    );
-};
+    </>
+  )
+}
 
-export default App;
+export default App
+
+
+
