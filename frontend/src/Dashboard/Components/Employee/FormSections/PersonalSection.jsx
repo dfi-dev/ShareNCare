@@ -17,7 +17,7 @@ const PersonalSection = forwardRef(({ profileImage, handleImageUpload, data, onC
     };
 
     return (
-        <section id="Personal" ref={ref} className="mt-2">
+        <section id="Personal" ref={ref} className="scroll-mt-32">
             <h2 className="text-xl mb-2">Personal</h2>
             <p className="text-gray-500 text-sm">2/3 mandatory fields</p>
 

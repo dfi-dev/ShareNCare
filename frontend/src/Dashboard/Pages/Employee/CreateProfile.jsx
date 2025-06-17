@@ -21,7 +21,7 @@ import CredentialsSection from "../../Components/Employee/FormSections/Credentia
 const CreateProfile = () => {
     const navigate = useNavigate();
     const { employeeId } = useParams();
-    const isEditMode = Boolean(employeeId);
+    const isEditMode = Boolean(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const { showSnackbar } = useSnackbar(); // Get the showSnackbar function from the context
@@ -36,21 +36,6 @@ const CreateProfile = () => {
         emergency: {},
         credentials: {}
     });
-
-    // function appendFormData(formData, data, parentKey = '') {
-    //     for (const key in data) {
-    //         const value = data[key];
-    //         const fullKey = parentKey ? `${parentKey}[${key}]` : key;
-
-    //         if (value instanceof File || value instanceof Blob) {
-    //             formData.append(fullKey, value);
-    //         } else if (typeof value === 'object' && value !== null) {
-    //             appendFormData(formData, value, fullKey); // recurse for nested object
-    //         } else {
-    //             formData.append(fullKey, value ?? ''); // treat null/undefined as empty string
-    //         }
-    //     }
-    // }
 
 
     const validateForm = () => {
@@ -83,11 +68,6 @@ const CreateProfile = () => {
             credentialErrors
         }).some((error) => Object.keys(error).length > 0);
     };
-
-
-    // const preFilledData = useMemo(() => {
-    //     return convertKeysToCamel(location.state?.employee);
-    // }, [location.state?.employee]);
 
     useEffect(() => {
         const fetchEmployeeData = async () => {
@@ -130,7 +110,7 @@ const CreateProfile = () => {
                             ...prev.emergency,
                             ...(preFilledData.emergencyContact || {}),
                         },
-                         credentials: {
+                        credentials: {
                             ...prev.credentials,
                             ...(preFilledData.credentials || {}),
                         },
@@ -148,9 +128,6 @@ const CreateProfile = () => {
 
         fetchEmployeeData();
     }, [employeeId]);
-
-
-
 
     const [formData, setFormData] = useState({
         personal: {},
@@ -187,14 +164,12 @@ const CreateProfile = () => {
         });
     };
 
-    const handleSectionClick = (section) => {
-        setActiveSection(section);
-        const sectionElement = sectionRefs[section]?.current;
-        if (sectionElement) {
-            window.scrollTo({
-                top: sectionElement.offsetTop - 20,
-                behavior: "smooth",
-            });
+    const handleSectionClick = (sectionKey) => {
+        const element = sectionRefs[sectionKey]?.current;
+        if (element) {
+            const yOffset = -70; // Ideal for your sticky header
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
         }
     };
 
@@ -212,9 +187,10 @@ const CreateProfile = () => {
     useEffect(() => {
         const observerOptions = {
             root: null,
-            rootMargin: "0px 0px -70% 0px",
-            threshold: 0,
+            rootMargin: '-60px 0px -60% 0px', // top and bottom margins
+            threshold: 0.1,
         };
+
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -237,40 +213,6 @@ const CreateProfile = () => {
             observer.disconnect();
         };
     }, []);
-
-    // Handle Save Draft functionality
-    const handleSaveDraft = async () => {
-        if (!isFormDirty) {
-            showSnackbar("No changes to save!", "warning");
-            return;
-        }
-
-        setIsLoading(true); // Start loading
-
-        try {
-            // Make an API request to save the form data as a draft
-            const response = await fetch("/api/saveDraft", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                showSnackbar("Draft saved successfully!", "success");
-                setIsFormDirty(false); // Reset dirty flag after saving
-            } else {
-                showSnackbar("Failed to save draft!", "error");
-            }
-        } catch (error) {
-            console.error("Error saving draft:", error);
-            showSnackbar("An error occurred while saving the draft.", "error");
-        }
-        finally {
-            setIsLoading(false); // Stop loading
-        }
-    };
 
     // Handle Form Submit (Publish)
     const handleSubmit = async () => {
@@ -333,6 +275,38 @@ const CreateProfile = () => {
         }
     };
 
+    useEffect(() => {
+        const observerOptions = {
+          root: null,
+          rootMargin: '0px 0px -15% 0px', // Adjust as needed
+          threshold: [0.75, 1],
+        };
+    
+        const handleIntersections = (entries) => {
+          // Filter entries to only intersecting
+          const visibleEntries = entries
+            .filter(entry => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+    
+          if (visibleEntries.length > 0) {
+            const activeId = visibleEntries[0].target.getAttribute('id');
+            setActiveSection(activeId);
+          }
+        };
+    
+        const observer = new IntersectionObserver(handleIntersections, observerOptions);
+    
+        // Observe all sections
+        Object.values(sectionRefs).forEach((ref) => {
+          if (ref.current) observer.observe(ref.current);
+        });
+    
+        // Cleanup
+        return () => observer.disconnect();
+    
+      }, [sectionRefs]);
+
+    
 
 
     return (
@@ -340,17 +314,20 @@ const CreateProfile = () => {
             {isLoading && <Loader message={isSavingDraft ? "Saving Draft..." : "Submitting..."} />} {/* Show loader while loading */}
             <Header
                 title={isEditMode ? "Edit Employee" : "Add New Employee"}
-                onSaveDraft={handleSaveDraft}  // Pass Save Draft function
+                onSaveDraft={() => { }}  // Pass Save Draft function
                 onSubmit={handleSubmit}         // Pass Submit function
                 isFormDirty={isFormDirty}       // Pass form dirty state
             />
 
             <div className="flex flex-1 overflow-hidden relative">
                 <Sidebar
-                    sections={Object.keys(sectionRefs)}
+                    sections={Object.keys(sectionRefs).filter(
+                        (key) => isEditMode || key !== "Credentials"
+                    )}
                     activeSection={activeSection}
                     handleSectionClick={handleSectionClick}
                 />
+
 
                 <main className="flex-1 overflow-y-auto px-4 py-6 lg:ml-64 lg:mr-72">
                     <div className="max-w-4xl mx-auto space-y-12">
@@ -392,12 +369,14 @@ const CreateProfile = () => {
                             onChange={(data) => handleFormDataChange("emergency", data)}
                             errors={errors.emergency}
                         />
-                        <CredentialsSection
-                            ref={sectionRefs.Credentials}
-                            data={formData.credentials}
-                            onChange={(data) => handleFormDataChange("credentials", data)}
-                            // errors={errors.credentialErrors}
-                        />
+                        {isEditMode && (
+                            <CredentialsSection
+                                ref={sectionRefs.Credentials}
+                                data={formData.credentials}
+                                onChange={(data) => handleFormDataChange("credentials", data)}
+                                errors={errors.credentialErrors}
+                            />
+                        )}
                     </div>
                 </main>
 

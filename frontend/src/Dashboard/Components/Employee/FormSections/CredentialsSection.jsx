@@ -7,7 +7,7 @@ const CredentialsSection = forwardRef(({ data, onChange, errors = {} }, ref) => 
     };
 
     return (
-        <section id="Credentials" ref={ref} className="mt-12">
+        <section id="Credentials" ref={ref} className="scroll-mt-32">
             <h2 className="text-xl mb-2">Credentials</h2>
 
             <div className="mb-10">

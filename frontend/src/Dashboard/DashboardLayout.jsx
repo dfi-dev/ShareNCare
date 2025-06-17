@@ -11,7 +11,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate()
   const location = useLocation()
   useEffect(()=>{
-    cache_cleaner()
+    // cache_cleaner()
     const accessToken = localStorage.getItem('access_token')
     setAccessToken(accessToken)
     if(!accessToken){

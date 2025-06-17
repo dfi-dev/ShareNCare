@@ -11,7 +11,7 @@ const JobSection = forwardRef(({ data, onChange, errors}, ref) => {
     };
 
     return (
-        <section id="Job" ref={ref} className="mt-12">
+        <section id="Job" ref={ref} className="scroll-mt-32">
             <h2 className="text-xl mb-2">Job</h2>
             <p className="text-gray-500 text-sm mb-6">0/3 mandatory fields</p>
 

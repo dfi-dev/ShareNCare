@@ -10,7 +10,7 @@ const LegalDocumentsSection = forwardRef(({ data, onChange, errors = {} }, ref) 
     };
 
     return (
-        <section id="LegalDocuments" ref={ref} className="mt-12">
+        <section id="LegalDocuments" ref={ref} className="scroll-mt-32">
             <h2 className="text-xl mb-4">Legal Documents</h2>
 
             <div className="mb-10">

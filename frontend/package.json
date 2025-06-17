@@ -17,7 +17,7 @@
     "@emotion/styled": "^11.14.0",
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^6.4.8",
-    "@mui/material": "^6.4.8",
+    "@mui/material": "^6.4.12",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/get-file": "^3.12.0",
     "@react-pdf-viewer/print": "^3.12.0",
