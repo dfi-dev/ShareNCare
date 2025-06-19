@@ -14,6 +14,7 @@ import CandidateProfile from "./Dashboard/Pages/Candidates/CandidateProfile";
 import JobPreview from "./Dashboard/Pages/Jobs/JobPreview";
 import ProfilePage from "./Dashboard/Pages/ProfilePage";
 import SettingsLayout from "./Dashboard/Pages/SettingsLayout";
+import {CalendarView} from "./Dashboard/Pages/Time-Off/CalenderView";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
 
         {/* Profile & Settings */}
+        <Route path="/calender" element={<CalendarView />} />
         <Route path="/dashboard/profile" element={<ProfilePage />} />
         <Route path="/dashboard/settings" element={<SettingsLayout />} />
 
