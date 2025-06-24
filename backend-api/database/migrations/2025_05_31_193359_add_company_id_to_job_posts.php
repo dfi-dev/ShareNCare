@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id')->nullable()->after('id');
         });
 
-        // 🔁 sharencare: Set default company_id = 1 for all job posts
+        // 🔁 Example: Set default company_id = 1 for all job posts
         DB::statement("UPDATE job_posts SET company_id = 1 WHERE company_id IS NULL");
 
         // ✅ Add foreign key constraint after data is updated

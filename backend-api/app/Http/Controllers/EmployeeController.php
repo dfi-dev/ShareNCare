@@ -81,9 +81,14 @@ class EmployeeController extends Controller
             ])->validate();
 
             if ($request->hasFile('personal.profileImage')) {
-                // Use store() method which will automatically move the file from the temporary location
-                $validatedEmployee['profile_image'] = $request->file('personal.profileImage')->store('profiles', 'public');
+                $image = $request->file('personal.profileImage');
+                $validatedEmployee['profile_image'] = $image->storeAs(
+                    'profiles',
+                    uniqid('profile_') . '.' . $image->extension(),
+                    'private'
+                );
             }
+
 
             // Add the company_id to the employee data before saving
             $validatedEmployee['company_id'] = $company->id;
@@ -146,14 +151,32 @@ class EmployeeController extends Controller
 
             // Store files if present
             if ($request->hasFile('legalDocuments.ssnFile')) {
-                $validatedLegal['ssn_file'] = $request->file('legalDocuments.ssnFile')->store('legal_docs', 'public');
+                $ssnFile = $request->file('legalDocuments.ssnFile');
+                $validatedLegal['ssn_file'] = $ssnFile->storeAs(
+                    'legal_docs',
+                    uniqid('ssn_') . '.' . $ssnFile->extension(),
+                    'private'
+                );
             }
+
             if ($request->hasFile('legalDocuments.nationalIdFile')) {
-                $validatedLegal['national_id_file'] = $request->file('legalDocuments.nationalIdFile')->store('legal_docs', 'public');
+                $nidFile = $request->file('legalDocuments.nationalIdFile');
+                $validatedLegal['national_id_file'] = $nidFile->storeAs(
+                    'legal_docs',
+                    uniqid('nid_') . '.' . $nidFile->extension(),
+                    'private'
+                );
             }
+
             if ($request->hasFile('legalDocuments.taxIdFile')) {
-                $validatedLegal['tax_id_file'] = $request->file('legalDocuments.taxIdFile')->store('legal_docs', 'public');
+                $taxFile = $request->file('legalDocuments.taxIdFile');
+                $validatedLegal['tax_id_file'] = $taxFile->storeAs(
+                    'legal_docs',
+                    uniqid('tax_') . '.' . $taxFile->extension(),
+                    'private'
+                );
             }
+
 
             // Create related model entry
             $employee->legalDocument()->create($validatedLegal);
@@ -173,8 +196,14 @@ class EmployeeController extends Controller
 
 
             if ($request->hasFile('experience.resume')) {
-                $validatedExperience['resume'] = $request->file('experience.resume')->store('resumes', 'public');
+                $resume = $request->file('experience.resume');
+                $validatedExperience['resume'] = $resume->storeAs(
+                    'resumes',
+                    uniqid('resume_') . '.' . $resume->extension(),
+                    'private'
+                );
             }
+
 
             $employee->experienceDetail()->create($validatedExperience);
 
@@ -208,11 +237,11 @@ class EmployeeController extends Controller
                 'name'            => $employee->first_name . ' ' . $employee->last_name,
                 'email'           => $userAccount->email,
                 'temp_password'   => $tempPassword,
-                'it_support_email' => 'itsupport@sharencare.co',
+                'it_support_email' => 'itsupport@bipani.co',
                 'sender_name'     => 'Anwar Kazi',
                 'sender_position' => 'CEO',
-                'company_name'    => 'sharencare',
-                'contact_info'    => 'contact@sharencare.co | +91-1234567890',
+                'company_name'    => 'Bipani',
+                'contact_info'    => 'contact@bipani.co | +91-1234567890',
             ];
 
             // Send welcome email
@@ -301,8 +330,14 @@ class EmployeeController extends Controller
             ])->validate();
 
             if ($request->hasFile('personal.profileImage')) {
-                $validatedEmployee['profile_image'] = $request->file('personal.profileImage')->store('profiles', 'public');
+                $image = $request->file('personal.profileImage');
+                $validatedEmployee['profile_image'] = $image->storeAs(
+                    'profiles',
+                    uniqid('profile_') . '.' . $image->extension(),
+                    'private'
+                );
             }
+
 
             $employee->update($validatedEmployee);
 
@@ -393,6 +428,25 @@ class EmployeeController extends Controller
 
             $employee->emergencyContact()->updateOrCreate([], $validatedEmergency);
 
+            // --- Step 7: Password Update (if provided) ---
+            $credentialsData = $requestData['credentials'] ?? [];
+
+            if (!empty($credentialsData['password'])) {
+                $validatedPassword = Validator::make($credentialsData, [
+                    'password' => 'required|string|min:6',
+                ])->validate();
+
+                $linkedUser = $employee->user;
+
+                if ($linkedUser) {
+                    $linkedUser->update([
+                        'password' => bcrypt($validatedPassword['password']),
+                    ]);
+                } else {
+                    Log::warning("Employee {$employee->id} does not have an associated user to update password.");
+                }
+            }
+
             DB::commit();
 
             return $this->successResponse(['employee_id' => $employee->id], 'Employee details updated successfully!');
@@ -401,7 +455,6 @@ class EmployeeController extends Controller
             return $this->errorResponse('Update failed: ' . $e->getMessage(), 500);
         }
     }
-
 
 
     // Get by emplopyee id (specific-employee)
@@ -452,6 +505,28 @@ class EmployeeController extends Controller
                 return $this->errorResponse('Unauthorized: User not authenticated.', 401);
             }
 
+            // For role 5 (employee), return only their own employee record
+            if ($user->role == 5) {
+                if (!$user->employee_id) {
+                    return $this->errorResponse('Unauthorized: No employee profile linked to this user.', 403);
+                }
+
+                $employee = Employee::with([
+                    'company',
+                    'jobDetail',
+                    'compensationDetail',
+                    'legalDocument',
+                    'experienceDetail',
+                    'emergencyContact'
+                ])->find($user->employee_id);
+
+                if (!$employee) {
+                    return $this->errorResponse('Employee not found.', 404);
+                }
+
+                // Return same response format — as a collection (array of one)
+                return $this->successResponse(EmployeeResource::collection(collect([$employee])), 'Employees fetched successfully');
+            }
 
             // Allowed role IDs: Owner = 1, HR = 2, Recruiter = 3, Finance = 4
             $allowedRoles = [1, 2, 3, 4];
@@ -464,7 +539,6 @@ class EmployeeController extends Controller
             if (!$user->company_id) {
                 return $this->errorResponse('Unauthorized: No company associated with this user.', 403);
             }
-
 
             // Fetch employees from the same company
             $employees = Employee::with([
@@ -481,6 +555,63 @@ class EmployeeController extends Controller
         } catch (\Exception $e) {
             // Return a standardized error response in case of an exception
             return $this->errorResponse('An error occurred while fetching employees: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * List employee names (id + name) for dropdowns and lightweight usage.
+     * 
+     * - Returns only basic employee fields: id, first_name, last_name.
+     * - Suitable for dropdowns, autocomplete, and quick lookups.
+     * - Much faster and smaller than full EmployeeResource list.
+     * 
+     * Access control:
+     * - Allowed roles: Owner (1), HR (2), Recruiter (3), Finance (4), Employee (5)
+     * - Employee role (5) only sees their own name.
+     * 
+     * 
+     */
+    public function listEmployeeNames()
+    {
+        try {
+            $user = auth()->user();
+
+            if (!$user) {
+                return $this->errorResponse('Unauthorized', 401);
+            }
+
+            $allowedRoles = [1, 2, 3, 4, 5]; // adjust as needed
+
+            if (!in_array($user->role, $allowedRoles)) {
+                return $this->errorResponse('Unauthorized', 403);
+            }
+
+            if ($user->role == 5) {
+                if (!$user->employee_id) {
+                    return $this->errorResponse('No employee profile linked.', 403);
+                }
+
+                $employee = Employee::select('id', 'first_name', 'last_name')
+                    ->find($user->employee_id);
+
+                if (!$employee) {
+                    return $this->errorResponse('Employee not found.', 404);
+                }
+
+                return $this->successResponse([$employee], 'Employee fetched successfully');
+            }
+
+            if (!$user->company_id) {
+                return $this->errorResponse('No company associated.', 403);
+            }
+
+            $employees = Employee::select('id', 'first_name', 'last_name')
+                ->where('company_id', $user->company_id)
+                ->get();
+
+            return $this->successResponse($employees, 'Employee names fetched successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('Error: ' . $e->getMessage(), 500);
         }
     }
 }

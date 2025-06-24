@@ -9,6 +9,7 @@ class EmployeeResource extends JsonResource
 {
     public function toArray($request)
     {
+
         return [
             'id' => $this->id,
             'first_name' => $this->first_name,
@@ -25,7 +26,7 @@ class EmployeeResource extends JsonResource
             'work_email' => $this->work_email,
             'personal_email' => $this->personal_email,
             'chat_video_call' => $this->chat_video_call,
-           'profile_image' => $this->profile_image ? asset(Storage::url($this->profile_image)) : null,
+            'profile_image' => $this->profile_image ? generateFileUrl($this->profile_image) : null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             // Include nested resources
@@ -37,4 +38,5 @@ class EmployeeResource extends JsonResource
             'emergency_contact' => new EmergencyContactResource($this->whenLoaded('emergencyContact')),
         ];
     }
+
 }

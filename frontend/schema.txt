@@ -1,0 +1,36 @@
+CREATE TABLE `time_off_requests` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    
+    `company_id` BIGINT UNSIGNED NOT NULL,
+    `employee_id` BIGINT UNSIGNED NOT NULL,
+    `user_id` BIGINT UNSIGNED NOT NULL, -- who submitted the request
+    
+    `manager_user_id` BIGINT UNSIGNED NULL, -- manager responsible for approval
+    
+    `type` INT NOT NULL, -- e.g. 1 = Paid Time Off, 2 = Sick Leave, etc
+    
+    `start_date` DATE NOT NULL,
+    `end_date` DATE NOT NULL,
+    
+    `first_day` DECIMAL(3,1) NOT NULL DEFAULT 1.0, -- 1.0 = full, 0.5 = half
+    `last_day` DECIMAL(3,1) NOT NULL DEFAULT 1.0,
+    
+    `total_days` DECIMAL(5,2) NOT NULL,
+    `total_hours` DECIMAL(5,2) NOT NULL,
+    
+    `note` TEXT NULL,
+    
+    `status` VARCHAR(50) NOT NULL DEFAULT 'Pending', -- Pending / Approved / Rejected / Cancelled
+    
+    `approved_by` BIGINT UNSIGNED NULL, -- user_id of approver
+    `approved_at` TIMESTAMP NULL,
+    
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`manager_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`approved_by`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -21,12 +21,13 @@ import CredentialsSection from "../../Components/Employee/FormSections/Credentia
 const CreateProfile = () => {
     const navigate = useNavigate();
     const { employeeId } = useParams();
-    const isEditMode = Boolean(false);
+    const isEditMode = Boolean(employeeId);
     const [isLoading, setIsLoading] = useState(false);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const { showSnackbar } = useSnackbar(); // Get the showSnackbar function from the context
     const [activeSection, setActiveSection] = useState("Personal");
     const [profileImage, setProfileImage] = useState(null);
+    
     const [errors, setErrors] = useState({
         personal: {},
         job: {},
@@ -69,6 +70,7 @@ const CreateProfile = () => {
         }).some((error) => Object.keys(error).length > 0);
     };
 
+
     useEffect(() => {
         const fetchEmployeeData = async () => {
             if (!employeeId) return;
@@ -110,7 +112,7 @@ const CreateProfile = () => {
                             ...prev.emergency,
                             ...(preFilledData.emergencyContact || {}),
                         },
-                        credentials: {
+                         credentials: {
                             ...prev.credentials,
                             ...(preFilledData.credentials || {}),
                         },
@@ -128,6 +130,7 @@ const CreateProfile = () => {
 
         fetchEmployeeData();
     }, [employeeId]);
+
 
     const [formData, setFormData] = useState({
         personal: {},
@@ -164,12 +167,14 @@ const CreateProfile = () => {
         });
     };
 
-    const handleSectionClick = (sectionKey) => {
-        const element = sectionRefs[sectionKey]?.current;
-        if (element) {
-            const yOffset = -70; // Ideal for your sticky header
-            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: 'smooth' });
+    const handleSectionClick = (section) => {
+        setActiveSection(section);
+        const sectionElement = sectionRefs[section]?.current;
+        if (sectionElement) {
+            window.scrollTo({
+                top: sectionElement.offsetTop - 20,
+                behavior: "smooth",
+            });
         }
     };
 
@@ -187,10 +192,9 @@ const CreateProfile = () => {
     useEffect(() => {
         const observerOptions = {
             root: null,
-            rootMargin: '-60px 0px -60% 0px', // top and bottom margins
-            threshold: 0.1,
+            rootMargin: "0px 0px -70% 0px",
+            threshold: 0,
         };
-
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -213,6 +217,7 @@ const CreateProfile = () => {
             observer.disconnect();
         };
     }, []);
+
 
     // Handle Form Submit (Publish)
     const handleSubmit = async () => {
@@ -275,46 +280,14 @@ const CreateProfile = () => {
         }
     };
 
-    useEffect(() => {
-        const observerOptions = {
-          root: null,
-          rootMargin: '0px 0px -15% 0px', // Adjust as needed
-          threshold: [0.75, 1],
-        };
-    
-        const handleIntersections = (entries) => {
-          // Filter entries to only intersecting
-          const visibleEntries = entries
-            .filter(entry => entry.isIntersecting)
-            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-    
-          if (visibleEntries.length > 0) {
-            const activeId = visibleEntries[0].target.getAttribute('id');
-            setActiveSection(activeId);
-          }
-        };
-    
-        const observer = new IntersectionObserver(handleIntersections, observerOptions);
-    
-        // Observe all sections
-        Object.values(sectionRefs).forEach((ref) => {
-          if (ref.current) observer.observe(ref.current);
-        });
-    
-        // Cleanup
-        return () => observer.disconnect();
-    
-      }, [sectionRefs]);
-
-    
 
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            {isLoading && <Loader message={isSavingDraft ? "Saving Draft..." : "Submitting..."} />} {/* Show loader while loading */}
+            {isLoading && <Loader />} {/* Show loader while loading */}
             <Header
                 title={isEditMode ? "Edit Employee" : "Add New Employee"}
-                onSaveDraft={() => { }}  // Pass Save Draft function
+                // onSaveDraft={handleSaveDraft}  // Pass Save Draft function
                 onSubmit={handleSubmit}         // Pass Submit function
                 isFormDirty={isFormDirty}       // Pass form dirty state
             />
@@ -327,7 +300,6 @@ const CreateProfile = () => {
                     activeSection={activeSection}
                     handleSectionClick={handleSectionClick}
                 />
-
 
                 <main className="flex-1 overflow-y-auto px-4 py-6 lg:ml-64 lg:mr-72">
                     <div className="max-w-4xl mx-auto space-y-12">

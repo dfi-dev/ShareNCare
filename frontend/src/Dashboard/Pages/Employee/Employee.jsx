@@ -20,6 +20,28 @@ export default function Employee() {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const { showSnackbar } = useSnackbar();
 
+    //Find out permanent solution 
+    const [role, setRole] = useState(null);
+
+    // Read role from localStorage once after mount
+    useEffect(() => {
+        const userString = localStorage.getItem("user");
+        console.log("Loaded userString:", userString);
+
+        if (userString) {
+            const user = JSON.parse(userString);
+            console.log("Parsed user:", user);
+            console.log("User role:", user.role);
+            setRole(Number(user.role));
+
+            // If role is 5, close dropdown:
+            if (Number(user.role) === 5) {
+                setOpenDropdownId(null);
+            }
+        }
+    }, []);
+
+
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
 
@@ -163,7 +185,7 @@ export default function Employee() {
                                 <ChevronDown className="w-4 h-4" />
                             </button>
 
-                            {openDropdownId === "add" && (
+                            {role !== 5 && openDropdownId === "add" && (
                                 <div className="dropdown-menu absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-10">
                                     <button
                                         onClick={() => handleDropdownSelect("Add manually")}

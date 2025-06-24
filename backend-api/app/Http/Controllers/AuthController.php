@@ -99,8 +99,8 @@ class AuthController extends Controller
             // Create the user and associate with company
             $user = User::create([
                 'company_id' => $company->id,
-                // 'first_name' => $request->first_name,
-                // 'last_name' => $request->last_name,
+                'first_name' => "N/A",
+                'last_name' => "N/A",
                 'email' => $request->email,
                 'role' => $request->role,
                 'is_active' => 1,
@@ -118,7 +118,7 @@ class AuthController extends Controller
                 'role' => 'Admin',
             ];
 
-            //Mail::to($data['email'])->send(new CompanyWelcomeMail($data));
+            Mail::to($data['email'])->send(new CompanyWelcomeMail($data));
 
             return new UserResource($user);
         } catch (\Exception $exp) {
@@ -159,12 +159,25 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
+        $user = auth()->user();
+
+        $response = [
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
+            'token_type'   => 'bearer',
+            'expires_in'   => auth()->factory()->getTTL() * 60,
+            'user'         => new UserResource($user),
+        ];
+
+        // If role == 5, add employee_id to the response
+        if ($user->role == 5) {
+            $response['employee_id'] = $user->employee_id;
+        }
+
+        return response()->json($response);
     }
+
+
+
 
     /**
      * 

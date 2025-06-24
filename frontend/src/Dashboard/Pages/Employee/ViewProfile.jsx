@@ -10,6 +10,9 @@ import EmployeeHeader from '../../Components/Employee/EmployeeHeader';
 import EmployeeTabs from '../../Components/Employee/EmployeeTabs'; import AssociatedCandidates from '../../Components/Employee/ProfileSections/AssociatedCandidates';
 import { useParams } from 'react-router-dom';
 import Loader from '../../Components/Loader'
+import LeaveBalance from '../Attendence/LeaveBalance';
+import UpcomingTimeOff from '../Attendence/UpcomingTimeOff';
+import TimeOffHistory from '../Attendence/TimeOffHistory';
 
 
 
@@ -74,32 +77,40 @@ const EmployeeProfileCard = () => {
     if (mainTab === 'Associated Candidates') {
       return <AssociatedCandidates candidates={associatedCandidates} loading={candidatesLoading} />;
     }
-    if (mainTab === 'Information' && subTab === 'Personal') {
-      return <PersonalTab employee={employeeData} />
+
+    if (mainTab === 'Information') {
+      if (subTab === 'Personal') {
+        return <PersonalTab employee={employeeData} />;
+      } else if (subTab === 'Job') {
+        return <JobInfoTab job={employeeData?.job_detail} />;
+      } else if (subTab === 'Compensation & Benefits') {
+        return <CompensationAndBenefitsTab compensationData={employeeData?.compensation_detail} />;
+      } else if (subTab === 'Legal Documents') {
+        return <LegalDocTab legalDocument={employeeData?.legal_document} />;
+      } else if (subTab === 'Experience') {
+        return <ExperienceTab experience={employeeData?.experience_detail} />;
+      } else if (subTab === 'Emergency') {
+        return <EmergencyTab emergency={employeeData?.emergency_contact} />;
+      }
     }
-    else if (mainTab === 'Information' && subTab === 'Job') {
-      return <JobInfoTab job={employeeData?.job_detail} />;
+
+    if (mainTab === 'Time Off') {
+      if (subTab === 'Balance') {
+        return <LeaveBalance/>;
+      } else if (subTab === 'Upcoming') {
+        return <UpcomingTimeOff/>;
+      } else if (subTab === 'History') {
+        return <TimeOffHistory/>;
+      }
     }
-    else if (mainTab === "Information" && subTab === "Compensation & Benefits") {
-      return <CompensationAndBenefitsTab compensationData={employeeData?.compensation_detail} />
-    }
-    else if (mainTab === "Information" && subTab === "Legal Documents") {
-      return <LegalDocTab legalDocument={employeeData?.legal_document} />
-    }
-    else if (mainTab === 'Information' && subTab === 'Experience') {
-      return <ExperienceTab experience={employeeData?.experience_detail} />
-    }
-    else if (mainTab === 'Information' && subTab === 'Emergency') {
-      return <EmergencyTab emergency={employeeData?.emergency_contact} />
-    }
-    else {
-      return null
-    }
-  }
+
+    return null;
+  };
+
 
   if (loading) {
-  return <Loader message="Getting employee details..." />;
-}
+    return <Loader message="Getting employee details..." />;
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">

@@ -34,7 +34,6 @@ class JobPostController extends Controller
         ]);
     }
 
-
     /**
      * Get a single job by ID.
      */
@@ -72,7 +71,6 @@ class JobPostController extends Controller
             "data" => $data
         ]);
     }
-
 
     /**
      * Create a new job.

@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         // Update null emails with generated unique placeholders
-        DB::statement('UPDATE candidates SET email = CONCAT("user", id, "@sharencare.com") WHERE email IS NULL');
+        DB::statement('UPDATE candidates SET email = CONCAT("user", id, "@example.com") WHERE email IS NULL');
 
         // Set default for null country values
         DB::table('candidates')->whereNull('country')->update(['country' => 'Unknown']);
@@ -25,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         // Optional rollback logic
-        DB::table('candidates')->where('email', 'like', 'user%@sharencare.com')->update(['email' => null]);
+        DB::table('candidates')->where('email', 'like', 'user%@example.com')->update(['email' => null]);
         DB::table('candidates')->where('country', 'Unknown')->update(['country' => null]);
     }
 };

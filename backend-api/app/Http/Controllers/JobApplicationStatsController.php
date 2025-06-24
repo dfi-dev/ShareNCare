@@ -55,5 +55,3 @@ class JobApplicationStatsController extends Controller
         ]);
     }
 }
-
-
