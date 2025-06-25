@@ -218,8 +218,6 @@ class EmployeeController extends Controller
             $employee->emergencyContact()->create($validatedEmergency);
 
 
-            // ✅ INSERT THIS BLOCK BEFORE DB::commit()
-
             // Generate a temporary password
             $tempPassword = Str::random(10);
 

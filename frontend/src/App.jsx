@@ -17,6 +17,7 @@ import SettingsLayout from './Dashboard/Pages/SettingsLayout';
 import {CalendarView} from './Dashboard/Pages/Time-Off/CalenderView';
 // import TimeOffRequestModal from './Dashboard/Pages/Attendence/TimeOffRequestModal';
 import UpcomingTimeOff from './Dashboard/Pages/Attendence/UpcomingTimeOff';
+import CandidateForm from './Test/CandidateForm';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
         <Route path='/' element={<Dashboard />} />
 
         {/* Profile & Settings */}
-        <Route path='/calender' element={<UpcomingTimeOff />} />
+        <Route path='/calender' element={<CandidateForm />} />
         <Route path='/dashboard/profile' element={<ProfilePage />} />
         <Route path='/dashboard/settings' element={<SettingsLayout />} />
 

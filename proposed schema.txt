@@ -1,0 +1,59 @@
+CREATE TABLE time_off_requests (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT UNSIGNED NOT NULL,
+    manager_id BIGINT UNSIGNED, -- used for filtering who manages this request
+    time_off_type_id BIGINT UNSIGNED NOT NULL,
+
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    first_day_type ENUM('full', 'half') DEFAULT 'full',
+    last_day_type ENUM('full', 'half') DEFAULT 'full',
+    total_days DECIMAL(5,2) NOT NULL,
+
+    note TEXT,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+    FOREIGN KEY (manager_id) REFERENCES employees(id) ON DELETE SET NULL,
+    FOREIGN KEY (time_off_type_id) REFERENCES time_off_types(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE time_off_types (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(191) NOT NULL,
+    description TEXT,
+    is_paid BOOLEAN NOT NULL DEFAULT FALSE,
+    requires_attachment BOOLEAN NOT NULL DEFAULT FALSE,
+    max_days INT UNSIGNED DEFAULT NULL, -- e.g., 10 for Sick, 20 for PTO
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+
+CREATE TABLE employee_leave_balances (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    employee_id BIGINT UNSIGNED NOT NULL,
+    time_off_type_id BIGINT UNSIGNED NOT NULL,
+    year YEAR NOT NULL,
+    allocated_days DECIMAL(5,2) NOT NULL DEFAULT 0,
+    used_days DECIMAL(5,2) NOT NULL DEFAULT 0,
+    carried_forward DECIMAL(5,2) DEFAULT 0, -- optional: for tracking carryovers
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+
+    UNIQUE KEY unique_employee_type_year (employee_id, time_off_type_id, year),
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+    FOREIGN KEY (time_off_type_id) REFERENCES time_off_types(id) ON DELETE CASCADE
+);
+
+
+
+
+
+
+
+
