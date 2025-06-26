@@ -9,6 +9,9 @@ import Loader from '../../Components/Loader'
 export default function CompanyProfileForm() {
     const { showSnackbar } = useSnackbar();
     const [loading, setLoading] = useState(false);
+    const [savingProfile, setSavingProfile] = useState(false);
+    const [savingIdentity, setSavingIdentity] = useState(false);
+
     const [formValues, setFormValues] = useState({
         companyName: "",
         companyWebsite: "",
@@ -57,15 +60,18 @@ export default function CompanyProfileForm() {
 
 
     // ✅ Update company profile
-    const handleSave = async () => {
+    const handleSave = async (section) => {
         try {
+            if (section === 'profile') setSavingProfile(true);
+            if (section === 'identity') setSavingIdentity(true);
+
             // Ensure website starts with https://
             let website = formValues.companyWebsite.trim();
             if (!website.startsWith("http://") && !website.startsWith("https://")) {
                 website = "https://" + website;
             }
 
-            // First, update profile
+            // Update profile
             await axios.put(
                 `${import.meta.env.VITE_API_BASE_URL}/company`,
                 {
@@ -83,7 +89,7 @@ export default function CompanyProfileForm() {
                 }
             );
 
-            // Then, upload logo if selected
+            // Upload logo if selected
             if (formValues.companyLogoFile) {
                 const formData = new FormData();
                 formData.append("logo", formValues.companyLogoFile);
@@ -99,16 +105,32 @@ export default function CompanyProfileForm() {
                     }
                 );
 
+                const newLogoUrl = logoRes.data.company_logo;
+
                 setFormValues((prev) => ({
                     ...prev,
-                    companyLogoUrl: logoRes.data.company_logo,
+                    companyLogoUrl: newLogoUrl,
                     companyLogoFile: null,
                 }));
+
+                // Update localStorage
+                const userStr = localStorage.getItem("user");
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    if (user.company) {
+                        user.company.company_logo = newLogoUrl;
+                        localStorage.setItem("user", JSON.stringify(user));
+                    }
+                }
             }
-            showSnackbar("Company info updated successfully", "success")
+
+            showSnackbar("Company info updated successfully", "success");
         } catch (err) {
             console.error("Failed to update company", err);
-            showSnackbar("Error updating company profile.", "error")
+            showSnackbar("Error updating company profile.", "error");
+        } finally {
+            if (section === 'profile') setSavingProfile(false);
+            if (section === 'identity') setSavingIdentity(false);
         }
     };
 
@@ -172,14 +194,18 @@ export default function CompanyProfileForm() {
                     </div>
                 </div>
 
+                {/* Profile Save button */}
                 <div className="mt-10">
                     <button
-                        className="bg-teal-600 text-white hover:bg-teal-700 px-5 py-2 text-sm rounded"
+                        className="bg-teal-600 text-white px-5 py-2 text-sm rounded hover:bg-teal-700 disabled:bg-teal-600 disabled:cursor-not-allowed"
                         type="button"
-                        onClick={handleSave}
+                        onClick={() => handleSave('profile')}
+                        disabled={savingProfile}
                     >
-                        Save changes
+                        {savingProfile ? "Saving..." : "Save changes"}
                     </button>
+
+
                 </div>
             </div>
 
@@ -190,7 +216,7 @@ export default function CompanyProfileForm() {
                     <div>
                         <p className="text-sm font-medium text-gray-700 mb-1">Company Logo</p>
                         <p className="text-sm text-gray-500 mb-3">
-                            myproject displays your company’s logo in your careers page, in emails to candidates as well as some job boards.
+                            Bipani displays your company’s logo in your careers page, in emails to candidates as well as some job boards.
                         </p>
 
                         {formValues.companyLogoUrl && (
@@ -229,13 +255,15 @@ export default function CompanyProfileForm() {
                     </div>
                 </div>
 
+                {/* Identity Save button */}
                 <div className="mt-10">
-                    <button
-                        className="bg-teal-600 text-white hover:bg-teal-700 px-5 py-2 text-sm rounded"
+                     <button
+                        className="bg-teal-600 text-white px-5 py-2 text-sm rounded hover:bg-teal-700 disabled:bg-teal-600 disabled:cursor-not-allowed"
                         type="button"
-                        onClick={handleSave}
+                        onClick={() => handleSave('identity')}
+                        disabled={savingIdentity}
                     >
-                        Save changes
+                        {savingIdentity ? "Saving..." : "Save changes"}
                     </button>
                 </div>
             </div>

@@ -1,38 +1,75 @@
 import React, { useEffect, useState } from "react";
 import UploadBox from "./UploadBox";
 import FormInput from "../FormInput";
-import CustomSelect from "../CustomSelect";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSnackbar } from '../../Components/SnackbarContext';
-import Loader from '../../Components/Loader'
+import Loader from '../../Components/Loader';
 import axios from "axios";
-
 
 export default function YourProfileForm() {
     const { showSnackbar } = useSnackbar();
     const [loading, setLoading] = useState(false);
+    const [savingProfile, setSavingProfile] = useState(false);        // <-- new state
+    const [savingCredentials, setSavingCredentials] = useState(false); // <-- new state
     const [showPasswordFields, setShowPasswordFields] = useState(false);
+
     const [formValues, setFormValues] = useState({
-        firstName: "Sourabh",
-        lastName: "Singh",
-        jobTitle: "Developer",
-        timeZone: "",
+        firstName: "",
+        lastName: "",
         profilePicture: null,
-        email: ""
+        profilePictureUrl: "",
+        email: "",
+        status: "",
     });
 
-
-    const handleChange = (key, value) => {
-        setFormValues((prev) => ({ ...prev, [key]: value }));
+    const handleChange = (field, value) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
     };
 
-    const handleProfileSave = () => {
-        console.log("Profile saved:", {
-            firstName: formValues.firstName,
-            lastName: formValues.lastName,
-            jobTitle: formValues.jobTitle,
-            profilePicture: formValues.profilePicture
-        });
+    const handleProfileSave = async () => {
+        setSavingProfile(true); // start loading
+        try {
+            const formData = new FormData();
+            console.log("Form Values on submit", formValues);
+
+            formData.append("first_name", formValues.firstName);
+            formData.append("last_name", formValues.lastName);
+
+            if (formValues.profilePicture instanceof File) {
+                formData.append("profile_image", formValues.profilePicture);
+            }
+
+            const res = await axios.post(
+                `${import.meta.env.VITE_API_BASE_URL}/profile?_method=PATCH`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                    },
+                }
+            );
+
+            const { user } = res.data;
+
+            setFormValues({
+                firstName: user.first_name || "",
+                lastName: user.last_name || "",
+                profilePicture: null,
+                profilePictureUrl: user.profile_image || "",
+                email: user.email || "",
+                status: user.status || "",
+            });
+
+            showSnackbar("Profile updated successfully.", "success");
+        } catch (err) {
+            const errorMessage = err.response?.data?.message || "Something went wrong.";
+            showSnackbar(errorMessage, "error");
+        } finally {
+            setSavingProfile(false); // end loading
+        }
     };
 
     const handleCredentialsSave = async () => {
@@ -54,6 +91,7 @@ export default function YourProfileForm() {
             }
         }
 
+        setSavingCredentials(true); // start loading
         try {
             const payload = { email };
             if (showPasswordFields) {
@@ -77,15 +115,16 @@ export default function YourProfileForm() {
         } catch (err) {
             const errorMessage = err.response?.data?.message || "Something went wrong.";
             showSnackbar(errorMessage, "error");
+        } finally {
+            setSavingCredentials(false); // end loading
         }
     };
 
-
     useEffect(() => {
         const fetchProfile = async () => {
-            setLoading(true); // Start loading before the request
+            setLoading(true);
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/profile`, {
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/profile`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                     },
@@ -93,21 +132,25 @@ export default function YourProfileForm() {
 
                 const { user } = res.data;
 
-                setFormValues((prev) => ({
-                    ...prev,
+                setFormValues({
+                    firstName: user.first_name || "",
+                    lastName: user.last_name || "",
+                    profilePicture: null,
+                    profilePictureUrl: user.profile_image || "",
                     email: user.email || "",
-                }));
+                    status: user.status || "",
+                });
+
             } catch (err) {
                 console.error("Failed to fetch profile", err);
                 showSnackbar("Failed to load profile info.", "error");
             } finally {
-                setLoading(false); // Stop loading after the request completes or fails
+                setLoading(false);
             }
         };
 
         fetchProfile();
     }, []);
-
 
     if (loading) {
         return (
@@ -124,6 +167,17 @@ export default function YourProfileForm() {
             <div className="bg-white rounded-[6px] shadow-md px-8 py-6 space-y-6">
                 <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Profile picture</p>
+
+                    {formValues.profilePictureUrl && (
+                        <div className="h-20 w-20 bg-white p-1 border rounded mb-3 flex items-center justify-center">
+                            <img
+                                src={formValues.profilePictureUrl}
+                                alt="Profile Picture"
+                                className="h-full w-full object-contain"
+                            />
+                        </div>
+                    )}
+
                     <UploadBox
                         label="Profile Picture"
                         buttonText="Upload an image"
@@ -150,42 +204,28 @@ export default function YourProfileForm() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
-                    <div className="flex flex-col justify-between">
-                        <FormInput
-                            label="Job title"
-                            value={formValues.jobTitle}
-                            onChange={(val) => handleChange("jobTitle", val)}
-                        />
-                        <div className="h-[20px]" />
-                    </div>
-                    <div className="flex flex-col justify-between">
-                        <FormInput
-                            label="Status"
-                            value={"Active"}
-                            onChange={(val) => handleChange("jobTitle", val)}
-                        />
-                    </div>
+                    <FormInput
+                        label="Status"
+                        value={formValues.status === 1 ? "Active" : "Inactive"}
+                        disabled={true}
+                    />
                 </div>
 
-                {/* Save Button for Profile */}
+                {/* Save Profile Button */}
                 <div className="pt-4">
                     <button
-                        className="bg-teal-600 text-white px-5 py-2 text-sm rounded 
-                   hover:bg-teal-700 disabled:bg-teal-600 disabled:cursor-not-allowed"
+                        className="bg-teal-600 text-white px-5 py-2 text-sm rounded hover:bg-teal-700 disabled:bg-teal-600 disabled:cursor-not-allowed"
                         onClick={handleProfileSave}
-                        disabled={true} // 👈 just for testing; replace with your condition
+                        disabled={savingProfile}
                     >
-                        Save Profile
+                        {savingProfile ? "Saving..." : "Save Profile"}
                     </button>
                 </div>
-
             </div>
 
             {/* CREDENTIALS Section */}
             <h3 className="text-[14px] text-gray-500 leading-relaxed font-semibold">CREDENTIALS</h3>
             <div className="bg-white rounded-[6px] shadow-md px-8 py-6 space-y-6">
-
-                {/* Email + Old Password Row */}
                 <div className="grid grid-cols-2 gap-6">
                     <FormInput
                         label="* Email"
@@ -203,7 +243,6 @@ export default function YourProfileForm() {
                     )}
                 </div>
 
-                {/* Toggle Password Button */}
                 <button
                     type="button"
                     className="text-sm text-gray-600 inline-flex items-center space-x-1 focus:outline-none"
@@ -230,7 +269,6 @@ export default function YourProfileForm() {
                     {showPasswordFields ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
 
-                {/* New + Confirm Password Row */}
                 {showPasswordFields && (
                     <div className="grid grid-cols-2 gap-6">
                         <FormInput
@@ -248,18 +286,16 @@ export default function YourProfileForm() {
                     </div>
                 )}
 
-                {/* Save Button */}
                 <div className="pt-4">
                     <button
-                        className="bg-teal-600 text-white hover:bg-teal-700 px-5 py-2 text-sm rounded"
+                        className="bg-teal-600 text-white hover:bg-teal-700 px-5 py-2 text-sm rounded disabled:bg-teal-600 disabled:cursor-not-allowed"
                         onClick={handleCredentialsSave}
+                        disabled={savingCredentials}
                     >
-                        Save Changes
+                        {savingCredentials ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </div>
-
-
         </div>
     );
 }

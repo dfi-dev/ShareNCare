@@ -1,14 +1,48 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import FormInput from "../FormInput";
 import FormDateInput from "../FormDateInput";
 import MultiLevelSelect from "../../MultiLevelSelect";
 import CustomSelect from "../../CustomSelect";
 import { entityOptionsData, departmentOptionsData } from "../../../../utils/selectOptionsData";
 
-const JobSection = forwardRef(({ data, onChange, errors}, ref) => {
+const JobSection = forwardRef(({ data, onChange, errors }, ref) => {
+    const [employeeOptions, setEmployeeOptions] = useState([]);
     const handleChange = (field, value) => {
         onChange({ [field]: value });
     };
+
+    useEffect(() => {
+        const fetchEmployeeOptions = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/employee/options`, {
+                    headers: {
+                        "Authorization": "Bearer " + localStorage.getItem("access_token"),
+                    },
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const employees = result?.data || [];
+
+                    // Map to array of { value, label } for select component
+                    const options = employees.map((emp) => ({
+                        value: emp.id,
+                        label: emp.name,
+                    }));
+
+                    setEmployeeOptions(options);
+                } else {
+                    console.log("Failed to fetch employee options");
+                }
+            } catch (error) {
+                console.error("Error fetching employee options:", error);
+            }
+        };
+
+        fetchEmployeeOptions();
+    }, []);
+
+
 
     return (
         <section id="Job" ref={ref} className="scroll-mt-32">
@@ -61,13 +95,23 @@ const JobSection = forwardRef(({ data, onChange, errors}, ref) => {
                         value={data.division || ""}
                         onChange={(val) => handleChange("division", val)}
                     /> */}
-                    <FormInput
+
+                    <CustomSelect
+                        label="Manager"
+                        optionsList={employeeOptions}
+                        required
+                        value={data.managerId || ""}
+                        onChange={(val) => handleChange("managerId", val)}
+                        error={errors.manager}
+                    />
+
+                    {/* <FormInput
                         label="Manager"
                         value={data.manager || ""}
                         onChange={(val) => handleChange("manager", val)}
                         required
                         error={errors.manager}
-                    />
+                    /> */}
                 </div>
             </div>
 

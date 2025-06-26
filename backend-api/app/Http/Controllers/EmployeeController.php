@@ -107,7 +107,7 @@ class EmployeeController extends Controller
                 'employment_type' => 'required|string|in:Contractor,Full-Time,Part-Time',
                 'workplace' => 'nullable|string|in:Onsite,Remote,Hybrid',
                 'expiry_date' => 'nullable|date',
-                'manager' => 'nullable|string',
+                'manager_id' => 'nullable|exists:employees,id',
                 'work_schedule' => 'nullable|string',
                 'note' => 'nullable|string'
             ])->validate();
@@ -217,6 +217,8 @@ class EmployeeController extends Controller
 
             $employee->emergencyContact()->create($validatedEmergency);
 
+
+            // ✅ INSERT THIS BLOCK BEFORE DB::commit()
 
             // Generate a temporary password
             $tempPassword = Str::random(10);
@@ -351,10 +353,15 @@ class EmployeeController extends Controller
                 'employment_type' => 'required|string|in:Contractor,Full-Time,Part-Time',
                 'workplace' => 'nullable|string|in:Onsite,Remote,Hybrid',
                 'expiry_date' => 'nullable|date',
-                'manager' => 'nullable|string',
+                'manager_id'      => 'nullable|exists:employees,id',
                 'work_schedule' => 'nullable|string',
                 'note' => 'nullable|string'
             ])->validate();
+
+            if (isset($validatedJob['manager_id']) && $validatedJob['manager_id'] == $employee->id) {
+                return $this->errorResponse('An employee cannot be their own manager.', 422);
+            }
+
 
             $employee->jobDetail()->updateOrCreate([], $validatedJob);
 
@@ -569,7 +576,7 @@ class EmployeeController extends Controller
      * 
      * 
      */
-    public function listEmployeeNames()
+    public function getEmployeeOptions()
     {
         try {
             $user = auth()->user();
@@ -578,34 +585,46 @@ class EmployeeController extends Controller
                 return $this->errorResponse('Unauthorized', 401);
             }
 
-            $allowedRoles = [1, 2, 3, 4, 5]; // adjust as needed
+            $allowedRoles = [1, 2, 3, 4, 5]; // Owner, HR, Recruiter, Finance, Employee
 
             if (!in_array($user->role, $allowedRoles)) {
                 return $this->errorResponse('Unauthorized', 403);
             }
 
+            // For role 5 (employee), return only themselves
             if ($user->role == 5) {
                 if (!$user->employee_id) {
                     return $this->errorResponse('No employee profile linked.', 403);
                 }
 
-                $employee = Employee::select('id', 'first_name', 'last_name')
-                    ->find($user->employee_id);
+                $employee = Employee::find($user->employee_id);
 
                 if (!$employee) {
                     return $this->errorResponse('Employee not found.', 404);
                 }
 
-                return $this->successResponse([$employee], 'Employee fetched successfully');
+                return $this->successResponse([
+                    [
+                        'id'   => $employee->id,
+                        'name' => $employee->first_name . ' ' . $employee->last_name
+                    ]
+                ], 'Employee fetched successfully');
             }
 
+            // Otherwise return all employees from the same company
             if (!$user->company_id) {
                 return $this->errorResponse('No company associated.', 403);
             }
 
             $employees = Employee::select('id', 'first_name', 'last_name')
                 ->where('company_id', $user->company_id)
-                ->get();
+                ->get()
+                ->map(function ($employee) {
+                    return [
+                        'id'   => $employee->id,
+                        'name' => $employee->first_name . ' ' . $employee->last_name,
+                    ];
+                });
 
             return $this->successResponse($employees, 'Employee names fetched successfully');
         } catch (\Exception $e) {

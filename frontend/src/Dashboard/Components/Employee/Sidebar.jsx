@@ -10,19 +10,18 @@ export default function Sidebar({ sections, activeSection, handleSectionClick })
     };
 
     return (
-        <aside className="hidden lg:block fixed top-18 left-0 w-68 bg-white p-6 border-r h-full overflow-y-auto">
+        <aside className="hidden lg:block fixed top-18 left-0 w-64 bg-white p-6 border-r h-full overflow-y-auto">
             <h2 className="text-lg mb-4">Profile sections</h2>
             <nav className="flex flex-col gap-2">
                 {sections.map((section) => (
                     <button
                         key={section}
                         onClick={() => handleSectionClick(section)}
-                        className={`text-left px-4 py-2 rounded text-sm transition-colors duration-200 ${
+                        className={`text-left px-4 py-2 rounded text-sm whitespace-nowrap ${
                             activeSection === section
-                              ? "bg-teal-700 text-white font-semibold"
-                              : "text-gray-600 hover:bg-gray-100"
-                          }`}
-                          
+                                ? "bg-teal-700 text-white"
+                                : "text-gray-600 hover:bg-gray-100"
+                        }`}
                     >
                         {formatSectionName(section)}
                     </button>
@@ -31,6 +30,3 @@ export default function Sidebar({ sections, activeSection, handleSectionClick })
         </aside>
     );
 }
-
-
-

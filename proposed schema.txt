@@ -51,6 +51,8 @@ CREATE TABLE employee_leave_balances (
 );
 
 
+{"personal":{"firstName":"Sachin Singh","lastName":"Raj","maritalStatus":"Single", "work_email":"abcd123@gmail.com"},"job":{"jobTitle":"cvsdv","startDate":"2025-05-01","employmentType":"Contractor","effectiveDate":"2025-05-01","workplace":"Onsite","note":"wedrr32","workSchedule":"4r23"},"compensationBenefits":{"bankName":"123131243","iban":"123342134"},"legalDocuments":{"socialSecurityNumber":"1231243134","nationalId":"1312vngd", "taxId": "q233"}} 
+
 
 
 

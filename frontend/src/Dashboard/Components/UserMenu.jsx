@@ -16,8 +16,9 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import BusinessIcon from "@mui/icons-material/Business";
 import AppsIcon from "@mui/icons-material/Apps";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { getAvatarUrl } from "../../utils/avatarUtils.js";
 
-const UserMenu = ({ loading, username, handleLogout, handleViewProfile, handleNavigateToSettings }) => {
+const UserMenu = ({ loading, username, companyName, companyLogo, role, handleLogout, handleViewProfile, handleNavigateToSettings }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const name = username?.split("@")[0] || "User";
 
@@ -29,20 +30,49 @@ const UserMenu = ({ loading, username, handleLogout, handleViewProfile, handleNa
     setAnchorEl(null);
   };
 
+  const avatarUrl = companyLogo
+    ? companyLogo
+    : getAvatarUrl(companyName, "", "");
+
   return (
     <>
-      <Avatar
-        onClick={handleOpen}
-        sx={{
-          bgcolor: "#0d9488",
-          color: "#ffffff",
-          fontSize: "",
-          cursor: "pointer",
-        }}
-      >
-        <PersonIcon fontSize="small" />
-      </Avatar>
-
+      {companyLogo ? (
+        <Box
+          onClick={handleOpen}
+          sx={{
+            width: 80, // fixed width
+            height: 30,
+            backgroundColor: "#ffffff",
+            borderRadius: "4px",
+            padding: "6px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            component="img"
+            src={avatarUrl}
+            sx={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
+      ) : (
+        <Avatar
+          onClick={handleOpen}
+          sx={{
+            bgcolor: "#0d9488",
+            color: "#ffffff",
+            cursor: "pointer",
+          }}
+        >
+          <PersonIcon fontSize="small" />
+        </Avatar>
+      )}
 
       <Menu
         anchorEl={anchorEl}
@@ -71,7 +101,7 @@ const UserMenu = ({ loading, username, handleLogout, handleViewProfile, handleNa
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#2D3748" }}>
-            {name}
+            {companyName}
           </Typography>
           <Typography
             variant="body2"
@@ -80,34 +110,39 @@ const UserMenu = ({ loading, username, handleLogout, handleViewProfile, handleNa
               fontSize: "1rem", // equivalent to Tailwind's text-md
             }}
           >
-            Chandigarh University
+            {name}
           </Typography>
 
+          {role === 4 && (
+            <button
+              onClick={() => {
+                handleViewProfile();
+                handleClose();
+              }}
+              className="w-[90%] mx-auto mt-3 text-sm text-teal-700 font-medium border border-teal-500 px-4 py-1.5 rounded-md hover:bg-teal-50 transition"
+            >
+              View profile
+            </button>
+          )}
 
-          <button
-            onClick={() => {
-              handleViewProfile();
-              handleClose();
-            }}
-            className="w-[90%] mx-auto mt-3 text-sm text-teal-700 font-medium border border-teal-500 px-4 py-1.5 rounded-md hover:bg-teal-50 transition"
-          >
-            View profile
-          </button>
 
         </Box>
 
         <Divider sx={{ my: 1 }} />
 
         {/* Unified Options */}
-        <MenuItem
-          onClick={() => {
-            handleNavigateToSettings();
-            handleClose();
-          }}
-        >
-          <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Settings" />
-        </MenuItem>
+        {/* Settings should not be shown if role === 5 */}
+        {role !== 5 && (
+          <MenuItem
+            onClick={() => {
+              handleNavigateToSettings();
+              handleClose();
+            }}
+          >
+            <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
+            <ListItemText primary="Settings" />
+          </MenuItem>
+        )}
         {/* <MenuItem onClick={handleClose}>
           <ListItemIcon><BusinessIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary="Switch company" />
