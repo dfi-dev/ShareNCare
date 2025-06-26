@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TimeOffRequestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -65,7 +66,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             Route::post('/', [EmployeeController::class, 'storeCompleteEmployee']); // POST /api/v.1/employee
             Route::put('/{id}', [EmployeeController::class, 'updateCompleteEmployee']); // PUT /api/v1/employee/{id}
             Route::get('/all', [EmployeeController::class, 'listAllEmployees']); // GET /api/v1/employee/all
-           Route::get('/options', [EmployeeController::class, 'getEmployeeOptions']); // GET /api/v1/employee/options
+            Route::get('/options', [EmployeeController::class, 'getEmployeeOptions']); // GET /api/v1/employee/options
             Route::get('{id}/details', [EmployeeController::class, 'getEmployeeDetailsById']); // GET /api/v.1/employee/{id}/complete
             Route::get('{employeeId}/assignments', [CandidateAssignmentController::class, 'getAssignedCandidatesForEmployee']);
         });
@@ -136,6 +137,19 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             Route::put('/credentials', [ProfileController::class, 'updateCredentials']);
             Route::post('/upload', [ProfileController::class, 'uploadProfilePicture']);
         });
+
+        // 🗓️ Time Off Requests
+        Route::prefix('time-off-requests')->group(function () {
+            Route::post('/', [TimeOffRequestController::class, 'submitTimeOffRequest']);
+            // 🔐 Place more specific routes BEFORE the generic one
+            Route::get('/manager/{managerId}', [TimeOffRequestController::class, 'getByManager']);
+            Route::get('/employee/{id}', [TimeOffRequestController::class, 'getByEmployeeId']);
+            Route::get('/{id}', [TimeOffRequestController::class, 'getById']);
+            Route::patch('/{id}', [TimeOffRequestController::class, 'update']);
+            Route::delete('/{id}', [TimeOffRequestController::class, 'destroy']);
+        });
+
+
 
         //Update at later stage above as comapny profile
         Route::get('/profile', [UserProfileController::class, 'show']);

@@ -102,4 +102,20 @@ class Employee extends Model
     {
         return $this->hasMany(JobDetail::class, 'manager_id');
     }
+
+    /**
+     * One-to-Many: An employee can have multiple leave balance records.
+     * 
+     * Explanation:
+     * Each employee is allocated leave balances for each time off type (e.g., Sick, PTO) and year.
+     * So, an employee may have multiple `employee_leave_balances` entries — 
+     * one for Sick Leave 2025, one for PTO 2025, etc.
+     * 
+     * That's why we use `hasMany()` — because one employee maps to many leave balance records.
+     */
+    public function leaveBalances()
+    {
+        return $this->hasMany(EmployeeLeaveBalance::class);
+    }
+
 }

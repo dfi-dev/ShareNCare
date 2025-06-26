@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -107,10 +108,19 @@ class EmployeeController extends Controller
                 'employment_type' => 'required|string|in:Contractor,Full-Time,Part-Time',
                 'workplace' => 'nullable|string|in:Onsite,Remote,Hybrid',
                 'expiry_date' => 'nullable|date',
-                'manager_id' => 'nullable|exists:employees,id',
+                'manager_id' => [
+                    'nullable',
+                    'integer',
+                    Rule::exists('employees', 'id')->where(function ($query) use ($company) {
+                        $query->where('company_id', $company->id); // restrict to same company
+                    }),
+                ],
                 'work_schedule' => 'nullable|string',
-                'note' => 'nullable|string'
+                'note' => 'nullable|string',
+            ], [
+                'manager_id.exists' => 'Selected manager does not exist.',
             ])->validate();
+
 
             $employee->jobDetail()->create($validatedJob);
 
@@ -225,29 +235,29 @@ class EmployeeController extends Controller
 
             // Create a user account for the employee
             $userAccount = User::create([
-                'company_id'  => $employee->company_id,
+                'company_id' => $employee->company_id,
                 'employee_id' => $employee->id,
-                'email'       => $employee->work_email ?? $employee->personal_email,
-                'password'    => Hash::make($tempPassword),
-                'role'        => 5, // Set correct role ID (e.g., 5 = Employee, adjust as needed)
+                'email' => $employee->work_email ?? $employee->personal_email,
+                'password' => Hash::make($tempPassword),
+                'role' => 5, // Set correct role ID (e.g., 5 = Employee, adjust as needed)
             ]);
 
             // Prepare welcome email data
             $emailData = [
-                'name'            => $employee->first_name . ' ' . $employee->last_name,
-                'email'           => $userAccount->email,
-                'temp_password'   => $tempPassword,
+                'name' => $employee->first_name . ' ' . $employee->last_name,
+                'email' => $userAccount->email,
+                'temp_password' => $tempPassword,
                 'it_support_email' => 'itsupport@bipani.co',
-                'sender_name'     => 'Anwar Kazi',
+                'sender_name' => 'Anwar Kazi',
                 'sender_position' => 'CEO',
-                'company_name'    => 'Bipani',
-                'contact_info'    => 'contact@bipani.co | +91-1234567890',
+                'company_name' => 'Bipani',
+                'contact_info' => 'contact@bipani.co | +91-1234567890',
             ];
 
             // Send welcome email
-            if (!empty($emailData['email'])) {
-                Mail::to($emailData['email'])->send(new \App\Mail\EmployeeNotificationMail($emailData));
-            }
+            // if (!empty($emailData['email'])) {
+            //     Mail::to($emailData['email'])->send(new \App\Mail\EmployeeNotificationMail($emailData));
+            // }
 
             DB::commit();
 
@@ -353,7 +363,7 @@ class EmployeeController extends Controller
                 'employment_type' => 'required|string|in:Contractor,Full-Time,Part-Time',
                 'workplace' => 'nullable|string|in:Onsite,Remote,Hybrid',
                 'expiry_date' => 'nullable|date',
-                'manager_id'      => 'nullable|exists:employees,id',
+                'manager_id' => 'nullable|exists:employees,id',
                 'work_schedule' => 'nullable|string',
                 'note' => 'nullable|string'
             ])->validate();
@@ -605,7 +615,7 @@ class EmployeeController extends Controller
 
                 return $this->successResponse([
                     [
-                        'id'   => $employee->id,
+                        'id' => $employee->id,
                         'name' => $employee->first_name . ' ' . $employee->last_name
                     ]
                 ], 'Employee fetched successfully');
@@ -621,7 +631,7 @@ class EmployeeController extends Controller
                 ->get()
                 ->map(function ($employee) {
                     return [
-                        'id'   => $employee->id,
+                        'id' => $employee->id,
                         'name' => $employee->first_name . ' ' . $employee->last_name,
                     ];
                 });
