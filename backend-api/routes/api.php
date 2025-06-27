@@ -139,15 +139,23 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
         });
 
         // 🗓️ Time Off Requests
-        Route::prefix('time-off-requests')->group(function () {
-            Route::post('/', [TimeOffRequestController::class, 'submitTimeOffRequest']);
-            // 🔐 Place more specific routes BEFORE the generic one
-            Route::get('/manager/{managerId}', [TimeOffRequestController::class, 'getByManager']);
-            Route::get('/employee/{id}', [TimeOffRequestController::class, 'getByEmployeeId']);
-            Route::get('/{id}', [TimeOffRequestController::class, 'getById']);
-            Route::patch('/{id}', [TimeOffRequestController::class, 'update']);
-            Route::delete('/{id}', [TimeOffRequestController::class, 'destroy']);
+        Route::prefix('time-off-requests')->controller(TimeOffRequestController::class)->group(function () {
+            // Create a new time off request
+            Route::post('/', 'submitTimeOffRequest');
+            // Get upcoming approved time off for logged-in employee
+            Route::get('/upcoming', 'getUpcomingForEmployee');
+            // Get requests by manager
+            Route::get('/manager/{managerId}', 'getByManager');
+            // Get requests by employee
+            Route::get('/employee/{employeeId}', 'getByEmployeeId');
+            // Approve/Reject time off request
+            Route::patch('/{id}/status', 'updateStatus');
+            // Delete a request
+            Route::delete('/{id}', 'destroy');
+            // Get single request
+            Route::get('/{id}', 'getById'); 
         });
+
 
 
 

@@ -24,7 +24,8 @@ class CreateTimeOffRequestsTable extends Migration
             // Store uploaded file path if attachment is needed (e.g., sick leave)
             $table->string('attachment')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-
+            $table->foreignId('updated_by')->nullable()->constrained('employees')->nullOnDelete();
+            $table->text('manager_note')->nullable();
             $table->timestamps();
         });
     }

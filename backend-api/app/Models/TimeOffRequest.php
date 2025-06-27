@@ -17,10 +17,11 @@ class TimeOffRequest extends Model
         'end_date',
         'first_day_type',
         'last_day_type',
-        'total_days',
+        'manager_note',
         'note',
         'attachment',
         'status',
+        'updated_by',
     ];
 
     public function scopeOverlappingWith($query, $start, $end)
@@ -49,5 +50,10 @@ class TimeOffRequest extends Model
     public function timeOffType()
     {
         return $this->belongsTo(TimeOffType::class);
+    }
+
+    public function updatedByEmployee()
+    {
+        return $this->belongsTo(Employee::class, 'updated_by');
     }
 }

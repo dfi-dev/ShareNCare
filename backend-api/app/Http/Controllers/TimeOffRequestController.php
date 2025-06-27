@@ -60,7 +60,6 @@ class TimeOffRequestController extends Controller
         }
 
         $totalDays = TimeOffHelper::calculateTotalDays($start, $end, $firstDayType, $lastDayType);
-        $totalHours = $totalDays * 8;
 
         // ✅ Handle file upload
         $attachmentPath = null;
@@ -80,7 +79,6 @@ class TimeOffRequestController extends Controller
             'first_day_type' => $firstDayType,
             'last_day_type' => $lastDayType,
             'total_days' => $totalDays,
-            'total_hours' => $totalHours,
             'note' => $validated['note'] ?? null,
             'attachment_path' => $attachmentPath,
             'status' => 'pending',
@@ -139,4 +137,102 @@ class TimeOffRequestController extends Controller
             'data' => $requests,
         ]);
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        // Ensure the user is an employee (manager)
+        if (!$user || !$user->employee_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized or employee ID not found.',
+            ], 403);
+        }
+
+        // Validate input
+        $validated = $request->validate([
+            'status' => 'required|in:approved,rejected',
+            'manager_note' => 'nullable|string',
+        ]);
+
+        $timeOff = TimeOffRequest::find($id);
+
+        if (!$timeOff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Time off request not found.',
+            ], 404);
+        }
+
+        // Ensure the user is the assigned manager
+        if ($timeOff->manager_id !== $user->employee_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not authorized to update this request.',
+            ], 403);
+        }
+
+        // Prevent updating if already processed
+        if (in_array($timeOff->status, ['approved', 'rejected', 'cancelled'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This time off request has already been processed and cannot be updated.',
+            ], 409);
+        }
+
+        // ✅ Update status and notes
+        $timeOff->update([
+            'status' => $validated['status'],
+            'manager_note' => $validated['manager_note'] ?? null,
+            'updated_by' => $user->employee_id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Time off request status updated.',
+            'data' => $timeOff,
+        ]);
+    }
+
+    public function getUpcomingForEmployee()
+    {
+        $user = auth()->user();
+        $employeeId = $user->employee_id;
+
+        if (!$employeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee ID not found for authenticated user.'
+            ], 403);
+        }
+
+        $today = now()->toDateString();
+
+        $requests = TimeOffRequest::with(['timeOffType', 'updatedByEmployee']) // include updatedByEmployee
+            ->where('employee_id', $employeeId)
+            ->where('status', 'approved')
+            ->where('end_date', '>=', $today)
+            ->orderBy('start_date')
+            ->get()
+            ->map(function ($req) {
+                $modifier = $req->updatedByEmployee;
+                $fullName = $modifier ? trim("{$modifier->first_name} {$modifier->last_name}") : 'N/A';
+
+                return [
+                    'date' => Carbon::parse($req->start_date)->format('d F Y'),
+                    'title' => $req->timeOffType->name,
+                    'days' => $req->total_days . ' day' . ($req->total_days > 1 ? 's' : ''),
+                    'status' => ucfirst($req->status),
+                    'modifiedDate' => Carbon::parse($req->updated_at)->format('d F Y'),
+                    'modifiedBy' => $fullName,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $requests,
+        ]);
+    }
+
 }
