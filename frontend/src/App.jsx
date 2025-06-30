@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Suspense } from 'react';
 import './App.css';
-import Dashboard from './Dashboard/Pages/Dashboard';
+import Dashboard from './Dashboard/Pages/Dashboard/Dashboard';
 import ScrollToTop from './Components/ScrollToTop';
 import Jobs from './Dashboard/Pages/Jobs/Jobs';
 import Employee from './Dashboard/Pages/Employee/Employee';
