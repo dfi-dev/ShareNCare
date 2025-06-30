@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\TimeOffHelper;
 use App\Models\Employee;
+use App\Models\EmployeeLeaveBalance;
 use App\Models\TimeOffRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,25 +27,40 @@ class TimeOffRequestController extends Controller
         $employee = Employee::with('jobDetail')->find($employeeId);
         $managerId = optional($employee->jobDetail)->manager_id;
 
-        // ✅ Validate with custom error message
+        if (!$managerId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not assigned to a manager and cannot apply for time off.'
+            ], 403);
+        }
+
+        // ✅ Validate with custom error messages
         $validated = $request->validate([
             'time_off_type_id' => 'required|exists:time_off_types,id',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
             'first_day_type' => 'in:full,half',
             'last_day_type' => 'in:full,half',
             'note' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ], [
+            'start_date.after_or_equal' => 'Start date cannot be in the past.',
             'end_date.after_or_equal' => 'End date must be the same as or after the start date.',
         ]);
 
-        // ✅ Default to 'full' if not sent
+        // Manual safety check to avoid bypassing
+        $start = Carbon::parse($validated['start_date']);
+        if ($start->lt(Carbon::today())) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Leave start date cannot be in the past.'
+            ], 422);
+        }
+
+        // Default to 'full' if not sent
         $firstDayType = $validated['first_day_type'] ?? 'full';
         $lastDayType = $validated['last_day_type'] ?? 'full';
 
-        // ✅ Calculate total days
-        $start = Carbon::parse($validated['start_date']);
         $end = Carbon::parse($validated['end_date']);
 
         $hasOverlap = TimeOffRequest::where('employee_id', $employeeId)
@@ -61,7 +77,6 @@ class TimeOffRequestController extends Controller
 
         $totalDays = TimeOffHelper::calculateTotalDays($start, $end, $firstDayType, $lastDayType);
 
-        // ✅ Handle file upload
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $attachment = $request->file('attachment');
@@ -69,7 +84,6 @@ class TimeOffRequestController extends Controller
             $attachmentPath = $attachment->storeAs('time_off_attachments', $fileName, 'private');
         }
 
-        // ✅ Save request
         $requestModel = TimeOffRequest::create([
             'employee_id' => $employeeId,
             'manager_id' => $managerId,
@@ -80,7 +94,8 @@ class TimeOffRequestController extends Controller
             'last_day_type' => $lastDayType,
             'total_days' => $totalDays,
             'note' => $validated['note'] ?? null,
-            'attachment_path' => $attachmentPath,
+            'attachment' => $attachmentPath,
+            'updated_by' => $employeeId,
             'status' => 'pending',
         ]);
 
@@ -90,7 +105,6 @@ class TimeOffRequestController extends Controller
             'data' => $requestModel,
         ], 201);
     }
-
 
 
     public function getById($id)
@@ -111,18 +125,75 @@ class TimeOffRequestController extends Controller
     }
 
 
-    public function getByManager($managerId)
+    public function getByManager(Request $request)
     {
-        $requests = TimeOffRequest::with(['employee', 'timeOffType']) // Optional: eager load related data
+        $managerId = auth()->user()->employee_id;
+
+        if (!$managerId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee ID not found for authenticated manager.'
+            ], 403);
+        }
+
+        $query = TimeOffRequest::with(['employee.jobDetail', 'timeOffType'])
             ->where('manager_id', $managerId)
-            ->orderByDesc('created_at')
-            ->get();
+            ->orderByDesc('created_at');
+
+        // Filter by type
+        if ($request->filled('type_id')) {
+            $query->where('time_off_type_id', $request->type_id);
+        } elseif ($request->filled('type')) {
+            $query->whereHas('timeOffType', function ($q) use ($request) {
+                $q->where('name', $request->type);
+            });
+        }
+
+        // Filter by start_date and end_date
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->where(function ($q) use ($request) {
+                $q->whereDate('start_date', '<=', $request->end_date)
+                    ->whereDate('end_date', '>=', $request->start_date);
+            });
+        }
+
+        $requests = $query->get();
+
+        $grouped = [];
+
+        foreach ($requests as $request) {
+            $employee = $request->employee;
+            $empId = $employee->id;
+
+            if (!isset($grouped[$empId])) {
+                $fullName = trim($employee->first_name . ' ' . $employee->last_name);
+
+                $grouped[$empId] = [
+                    'empId' => $empId,
+                    'name' => $fullName,
+                    'role' => $employee->jobDetail->job_title ?? 'N/A',
+                    'avatar' => generateFileUrl($employee->profile_image) ?? null,
+                    'leaves' => []
+                ];
+            }
+
+            $grouped[$empId]['leaves'][] = [
+                'id' => $request->id,
+                'start' => $request->start_date,
+                'end' => $request->end_date,
+                'status' => $request->status,
+                'created_at' => $request->created_at,
+                'label' => $request->timeOffType->name ?? 'Unknown'
+            ];
+        }
 
         return response()->json([
             'success' => true,
-            'data' => $requests
+            'data' => array_values($grouped)
         ]);
     }
+
+
 
 
     public function getByEmployeeId($employeeId)
@@ -195,7 +266,9 @@ class TimeOffRequestController extends Controller
         ]);
     }
 
-    public function getUpcomingForEmployee()
+
+
+    public function getUpcomingTimeOff()
     {
         $user = auth()->user();
         $employeeId = $user->employee_id;
@@ -220,10 +293,12 @@ class TimeOffRequestController extends Controller
                 $fullName = $modifier ? trim("{$modifier->first_name} {$modifier->last_name}") : 'N/A';
 
                 return [
+                    'id' => $req->id,
                     'date' => Carbon::parse($req->start_date)->format('d F Y'),
                     'title' => $req->timeOffType->name,
                     'days' => $req->total_days . ' day' . ($req->total_days > 1 ? 's' : ''),
                     'status' => ucfirst($req->status),
+                    'note' => $req->note,
                     'modifiedDate' => Carbon::parse($req->updated_at)->format('d F Y'),
                     'modifiedBy' => $fullName,
                 ];
@@ -235,4 +310,80 @@ class TimeOffRequestController extends Controller
         ]);
     }
 
+
+    public function getAllTimeOff()
+    {
+        $user = auth()->user();
+        $employeeId = $user->employee_id;
+
+        if (!$employeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee ID not found for authenticated user.'
+            ], 403);
+        }
+
+        $requests = TimeOffRequest::with(['timeOffType', 'updatedByEmployee'])
+            ->where('employee_id', $employeeId)
+            ->orderByDesc('start_date')
+            ->get()
+            ->map(function ($req) {
+                $modifier = $req->updatedByEmployee;
+                $fullName = $modifier ? trim("{$modifier->first_name} {$modifier->last_name}") : 'N/A';
+
+                return [
+                    'id' => $req->id,
+                    'date' => Carbon::parse($req->start_date)->format('d F Y'),
+                    'title' => $req->timeOffType->name,
+                    'days' => $req->total_days . ' day' . ($req->total_days > 1 ? 's' : ''),
+                    'status' => ucfirst($req->status),
+                    'note' => $req->note,
+                    'modifiedDate' => Carbon::parse($req->updated_at)->format('d F Y'),
+                    'modifiedBy' => $fullName,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $requests,
+        ]);
+    }
+
+    public function getLeaveBalance()
+    {
+        $employeeId = auth()->user()->employee_id;
+
+        if (!$employeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee ID not found.',
+            ], 403);
+        }
+
+        $year = now()->year;
+
+        $balances = EmployeeLeaveBalance::with('timeOffType')
+            ->where('employee_id', $employeeId)
+            ->where('year', $year)
+            ->get()
+            ->map(function ($balance) {
+                $allocated = (float) $balance->allocated_days;
+                $used = (float) $balance->used_days;
+                $remaining = max(0, $allocated - $used);
+
+                return [
+                    'id' => $balance->id,
+                    'type' => $balance->timeOffType->name ?? 'N/A',
+                    'allocated_days' => $allocated,
+                    'used_days' => $used,
+                    'remaining_days' => $remaining,
+                    'carried_forward' => (float) ($balance->carried_forward ?? 0),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $balances,
+        ]);
+    }
 }

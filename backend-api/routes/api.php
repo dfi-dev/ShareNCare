@@ -143,9 +143,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             // Create a new time off request
             Route::post('/', 'submitTimeOffRequest');
             // Get upcoming approved time off for logged-in employee
-            Route::get('/upcoming', 'getUpcomingForEmployee');
+            Route::get('/upcoming', 'getUpcomingTimeOff');
+            Route::get('/all', 'getAllTimeOff');
+            // Get leave balance for the logged-in employee
+            Route::get('/leave-balance', 'getLeaveBalance');
             // Get requests by manager
-            Route::get('/manager/{managerId}', 'getByManager');
+            Route::get('/manager', 'getByManager');
             // Get requests by employee
             Route::get('/employee/{employeeId}', 'getByEmployeeId');
             // Approve/Reject time off request
@@ -153,7 +156,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             // Delete a request
             Route::delete('/{id}', 'destroy');
             // Get single request
-            Route::get('/{id}', 'getById'); 
+            Route::get('/{id}', 'getById');
         });
 
 

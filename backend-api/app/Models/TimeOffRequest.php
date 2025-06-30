@@ -17,10 +17,11 @@ class TimeOffRequest extends Model
         'end_date',
         'first_day_type',
         'last_day_type',
-        'manager_note',
+        'total_days',
         'note',
         'attachment',
         'status',
+        'manager_note',    
         'updated_by',
     ];
 

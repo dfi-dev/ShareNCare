@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SourceSeeder::class,
             TimeOffTypesSeeder::class,
+            EmployeeLeaveBalanceSeeder::class,
         ]);
     }
 }

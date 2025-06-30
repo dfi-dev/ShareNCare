@@ -103,6 +103,11 @@ class Employee extends Model
         return $this->hasMany(JobDetail::class, 'manager_id');
     }
 
+    public function isManager()
+{
+    return $this->subordinates()->exists();
+}
+
     /**
      * One-to-Many: An employee can have multiple leave balance records.
      * 

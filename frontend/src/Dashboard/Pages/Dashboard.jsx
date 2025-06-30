@@ -36,7 +36,7 @@ const Dashboard = ({username}) => {
             <div className='col-span-9 h-96 w-[100%] bg-white rounded-lg border-2 border-gray-200 shadow-sm shadow-gray-200'></div>
             <div className='col-span-3 h-96 w-[100%] bg-white rounded-lg border-2 border-gray-200 shadow-sm shadow-gray-200'></div>
         </div> */}
-        {/* <p className='text-black text-xl'>myproject Dashboard</p> */}
+        {/* <p className='text-black text-xl'>Bipani Dashboard</p> */}
     </div>
   )
 }
