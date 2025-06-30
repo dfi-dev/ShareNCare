@@ -24,10 +24,10 @@ const OnboardNewHiresCard = () => {
   return (
     <div className="bg-white rounded-xl shadow p-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 pt-6 pb-4">
-        <IconWrapper>
-          <Rocket className="w-4 h-4" />
-        </IconWrapper>
+      <div className="flex items-center gap-3 px-6 py-4 border-b">
+        <div className="w-10 h-10 bg-[#007a6e] rounded-full flex items-center justify-center text-white">
+          <Rocket className="w-5 h-5" />
+        </div>
         <h2 className="text-lg font-semibold text-black">Onboard New Hires</h2>
       </div>
 
@@ -35,7 +35,7 @@ const OnboardNewHiresCard = () => {
       <hr className="border-gray-200" />
 
       {/* Section Title */}
-      <p className="text-sm font-semibold text-indigo-600 px-6 py-2">Employees</p>
+      <p className="text-sm font-semibold text-[#0e079a] px-6 py-2">Employees</p>
 
       {/* Hires List */}
       <div className="divide-y">
@@ -49,7 +49,7 @@ const OnboardNewHiresCard = () => {
             <div>
               <p className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                 {hire.name}
-                <span className="text-[10px] bg-[#E8FBF7] text-[#00C49A] px-2 py-0.5 rounded-full font-medium">
+                <span className="text-[10px] bg-[#E8FBF7] text-[#007a6e] px-2 py-0.5 rounded-full font-medium">
                   SAMPLE
                 </span>
               </p>

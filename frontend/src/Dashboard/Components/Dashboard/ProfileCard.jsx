@@ -2,8 +2,8 @@ import React from "react";
 
 const ProfileCard = () => {
   return (
-    <div className="bg-[#035946] text-white rounded-[20px] p-6 space-y-5 w-full max-w-sm mx-auto">
-      <div className="w-16 h-16 rounded-full bg-white text-[#035946] text-xl font-bold flex items-center justify-center mx-auto">
+    <div className="bg-[#007A6E] text-white rounded-2xl shadow p-6 space-y-5 w-full max-w-sm mx-auto">
+      <div className="w-16 h-16 rounded-full bg-white text-[#007A6E] text-xl font-bold flex items-center justify-center mx-auto">
         SS
       </div>
 
@@ -19,7 +19,7 @@ const ProfileCard = () => {
         </p>
       </div>
 
-      <div className="bg-[#00C49A] bg-opacity-20 p-3 rounded-xl space-y-2">
+      <div className="bg-[#00B5A0] p-3 rounded-xl space-y-2">
         <p className="text-sm font-semibold text-white">Manager</p>
         <div className="flex items-center gap-3">
           <img
@@ -34,7 +34,7 @@ const ProfileCard = () => {
         </div>
       </div>
 
-      <div className="bg-[#00C49A] bg-opacity-20 p-3 rounded-xl space-y-2">
+      <div className="bg-[#00B5A0] p-3 rounded-xl space-y-2">
         <p className="text-sm font-semibold text-white">Teammates</p>
         <div className="flex items-center gap-3">
           <img

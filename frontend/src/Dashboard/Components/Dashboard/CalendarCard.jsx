@@ -18,11 +18,11 @@ const CalendarCard = () => {
 
   return (
     <div className="bg-white rounded-xl shadow">
-      <div className="flex items-center gap-3 p-6 border-b">
-        <IconWrapper>
-          <CalendarDays className="w-4 h-4" />
-        </IconWrapper>
-        <p className="font-medium text-gray-800">Wednesday 23 Jan, 2025</p>
+      <div className="flex items-center gap-3 px-6 py-4 border-b">
+        <div className="w-10 h-10 bg-[#007a6e] rounded-full flex items-center justify-center text-white">
+          <CalendarDays className="w-5 h-5" />
+        </div>
+        <p className="text-sm text-gray-800">Wednesday 23 Jan, 2025</p>
       </div>
       <div className="flex p-6 gap-6">
         {/* Tabs */}
@@ -30,19 +30,17 @@ const CalendarCard = () => {
           {tabs.map((tab, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between px-3 py-1.5 rounded-full text-sm font-medium ${
-                tab.active
-                  ? "bg-[#035946] text-white"
+              className={`flex items-center justify-between px-3 py-1.5 rounded-full text-sm font-medium ${tab.active
+                  ? "bg-[#007a6e] text-white"
                   : "bg-[#F3F7F8] text-[#757575]"
-              }`}
-            >
-              <span>{tab.label}</span>
-              <span
-                className={`text-xs w-5 h-5 rounded-full flex items-center justify-center ${
-                  tab.active
-                    ? "bg-[#8800C7] text-white"
-                    : "bg-[#D6EBF2] text-[#757575]"
                 }`}
+            >
+              <span className="text-sm">{tab.label}</span>
+              <span
+                className={`text-[10px] w-4 h-4 rounded-full flex items-center justify-center ${tab.active
+                    ? "bg-[#0e079a] text-white"
+                    : "bg-[#D6EBF2] text-[#757575]"
+                  }`}
               >
                 {tab.count}
               </span>

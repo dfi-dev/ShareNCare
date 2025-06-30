@@ -15,12 +15,12 @@ const JobsCard = () => {
     <div className="bg-white rounded-2xl shadow overflow-hidden">
       <div className="flex justify-between items-center px-6 py-4 border-b">
         <div className="flex items-center gap-3">
-          <IconWrapper>
-            <Briefcase className="w-4 h-4" />
-          </IconWrapper>
+          <div className="w-10 h-10 bg-[#007a6e] rounded-full flex items-center justify-center text-white">
+            <Briefcase className="w-5 h-5" />
+          </div>
           <h2 className="text-lg font-semibold text-black">Jobs</h2>
         </div>
-        <button className="bg-[#035946] text-white px-5 py-1.5 rounded-full text-sm font-medium">
+        <button className="bg-[#007a6e] text-white px-5 py-1.5 rounded-full text-sm font-medium">
           Create Job
         </button>
       </div>
@@ -37,7 +37,7 @@ const JobsCard = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-[#00C49A] bg-[#E6FAF5] px-2 py-[2px] rounded-full font-medium">
+            <span className="text-[10px] text-[#007a6e] bg-[#E6FAF5] px-2 py-[2px] rounded-full font-medium">
               SAMPLE
             </span>
             <div className="flex items-center gap-1 text-sm text-gray-700">
@@ -69,7 +69,7 @@ const JobsCard = () => {
       ))}
 
       <div className="text-center px-6 py-3">
-        <button className="text-sm text-[#635BFF] font-medium">View All Jobs</button>
+        <button className="text-sm text-[#0e079a] font-medium">View All Jobs</button>
       </div>
     </div>
   );

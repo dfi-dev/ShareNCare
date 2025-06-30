@@ -9,35 +9,27 @@ const timeOffs = [
 
 const UpcomingTimeOffCard = () => {
   return (
-    <div className="bg-white rounded-2xl shadow w-full max-w-sm">
-      {/* Header */}
-      <div className="p-6 pb-3">
-        <h2 className="text-lg font-bold text-black">Upcoming Time-off</h2>
-      </div>
+    <div className="bg-white rounded-2xl shadow p-6 w-full max-w-sm mx-auto">
+      <h2 className="text-lg font-semibold mb-2 px-2">Upcoming Time-off</h2>
+      <hr className="-mx-6 border-t border-gray-200 my-2" />
 
-      {/* Header Separator */}
-      <div className="border-t border-gray-200" />
-
-      {/* Time-Off List */}
-      <div className="p-6 pt-4 space-y-4">
+      <div className="space-y-4">
         {timeOffs.map((leave, i) => (
           <div
             key={i}
-            className={`flex items-start gap-3 ${
-              i !== timeOffs.length - 1 ? "pb-4 border-b border-gray-200" : ""
-            }`}
+            className={`flex gap-3 ${i !== timeOffs.length - 1 ? "pb-4 border-b border-gray-200" : ""}`}
           >
-            {/* Icon */}
-            <div className="w-10 h-10 rounded-lg bg-[#E5F8F3] flex items-center justify-center">
-              <CalendarDays className="text-[#00C49A] w-5 h-5" />
+            {/* Vertically centered icon block */}
+            <div className="w-12 h-12 rounded-lg bg-[#E5F8F3] flex items-center justify-center self-center">
+              <CalendarDays className="text-[#007A6E] w-5 h-5" />
             </div>
 
-            {/* Details */}
+            {/* Text content */}
             <div className="flex-1 space-y-1">
-              <p className="font-semibold text-sm text-gray-900">{leave.type}</p>
-              <p className="text-sm text-gray-700">{leave.date}</p>
+              <p className="font-semibold text-sm text-black">{leave.type}</p>
+              <p className="text-sm text-[#1A1A1A]">{leave.date}</p>
               <div className="flex items-center gap-1 text-xs text-gray-500">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-3 h-3" />
                 <span>{leave.duration}</span>
               </div>
             </div>

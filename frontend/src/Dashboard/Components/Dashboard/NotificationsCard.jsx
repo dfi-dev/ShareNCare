@@ -28,20 +28,13 @@ const NotificationItem = () => (
 
 const NotificationsCard = () => {
   return (
-    <div className="bg-white rounded-2xl shadow p-4">
-      {/* Header */}
-      <h2 className="text-lg font-semibold px-2">Notification</h2>
-
-      {/* Header separator */}
-      <hr className="border-t border-gray-200 my-2" />
-
-      {/* Items */}
+    <div className="bg-white rounded-2xl shadow p-6 w-full max-w-sm mx-auto">
+      <h2 className="text-lg font-semibold mb-2 px-2">Notification</h2>
+    <hr className="-mx-6 border-t border-gray-200 my-2" />
       {[...Array(3)].map((_, i, arr) => (
         <div key={i}>
           <NotificationItem />
-          {i < arr.length - 1 && (
-            <hr className="border-t border-gray-200 mx-2" />
-          )}
+          {i < arr.length - 1 && <hr className="border-t border-gray-200 mx-2" />}
         </div>
       ))}
     </div>
