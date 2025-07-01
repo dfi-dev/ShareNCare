@@ -21,15 +21,15 @@ export default function Dashboard() {
         <div className="space-y-6">
           <CalendarCard />
           <JobsCard />
-          {/* <OnboardNewHiresCard />
-          <TimeOffBalancesCard /> */}
+          <OnboardNewHiresCard />
+          <TimeOffBalancesCard />
         </div>
 
         {/* RIGHT SIDE */}
         <div className="space-y-6">
           <ProfileCard />
-          {/* <NotificationsCard />
-          <UpcomingTimeOffCard /> */}
+          <NotificationsCard />
+          <UpcomingTimeOffCard />
         </div>
       </div>
     </div>

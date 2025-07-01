@@ -18,6 +18,21 @@ const hires = [
     role: "Sales Development Representative",
     avatar: "https://randomuser.me/api/portraits/women/21.jpg",
   },
+  {
+    name: "Rama Panda",
+    role: "Sale Executive",
+    avatar: "https://randomuser.me/api/portraits/men/12.jpg",
+  },
+  // {
+  //   name: "Keshav Rao",
+  //   role: "Finance Manager",
+  //   avatar: "https://randomuser.me/api/portraits/men/21.jpg",
+  // },
+  // {
+  //   name: "Ritvik Srivastava",
+  //   role: "Sales Development Representative",
+  //   avatar: "https://randomuser.me/api/portraits/men/78.jpg",
+  // }
 ];
 
 const OnboardNewHiresCard = () => {
