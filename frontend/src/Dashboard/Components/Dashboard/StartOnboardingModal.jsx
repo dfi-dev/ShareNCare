@@ -16,7 +16,13 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
     setIsSubmitting(true);
     setSubmittingAction("start");
     setTimeout(() => {
-      onStart({ profileTemplate, onboardingWorkflow, startDate, publishProfile, inviteUser });
+      onStart({
+        profileTemplate,
+        onboardingWorkflow,
+        startDate,
+        publishProfile,
+        inviteUser,
+      });
       setIsSubmitting(false);
       setSubmittingAction("");
     }, 2000);
@@ -24,19 +30,20 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
 
   return (
     <ModalWrapper>
-      <div className="bg-white w-full max-w-md rounded-lg shadow-lg p-8 relative">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-800">
+      <div className="bg-white w-full max-w-xl min-h-[520px] rounded-lg shadow-lg px-10 py-10 relative space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-800">
             Start Onboarding for {candidateName}
           </h2>
           <button onClick={onCancel}>
-            <X className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+            <X className="w-6 h-6 text-gray-500 hover:text-gray-700" />
           </button>
         </div>
 
         {/* Profile Template */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <label className="block text-md font-medium text-gray-700">
             Profile Template <span className="text-red-500">*</span>
           </label>
           <select
@@ -49,8 +56,8 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
         </div>
 
         {/* Onboarding Workflow */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <label className="block text-md font-medium text-gray-700">
             Onboarding Workflow <span className="text-red-500">*</span>
           </label>
           <select
@@ -63,9 +70,11 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
         </div>
 
         {/* Start Date */}
-        <div className="mb-4">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Onboarding Start Date</p>
-          <div className="flex items-center gap-4">
+        <div className="space-y-2">
+          <p className="text-md font-semibold text-gray-700">
+            Onboarding Start Date
+          </p>
+          <div className="flex items-center gap-6">
             <label className="flex items-center text-sm text-gray-700">
               <input
                 type="radio"
@@ -73,9 +82,10 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
                 value="immediately"
                 checked={startDate === "immediately"}
                 onChange={() => setStartDate("immediately")}
-                className="text-[#007a6e] focus:ring-[#007a6e]"
+                className="text-[#007a6e] focus:ring-[#007a6e] w-[18px] h-[20px]"
               />
-              <span className="ml-2">Immediately</span>
+
+              <span className="ml-2 text-md">Immediately</span>
             </label>
             <label className="flex items-center text-sm text-gray-700">
               <input
@@ -84,7 +94,7 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
                 value="custom"
                 checked={startDate === "custom"}
                 onChange={() => setStartDate("custom")}
-                className="text-[#007a6e] focus:ring-[#007a6e]"
+                className="text-[#007a6e] focus:ring-[#007a6e] w-[18px] h-[20px]"
               />
               <span className="ml-2">Custom</span>
             </label>
@@ -92,28 +102,40 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
         </div>
 
         {/* Checkboxes */}
-        <div className="mb-4">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Publish profile and invite user</p>
-          <label className="flex items-center mb-2 text-sm text-gray-700">
+        <div className="space-y-3">
+          <p className="text-md font-semibold text-gray-700">
+            Publish profile and invite user
+          </p>
+          <label className="flex items-center text-md text-gray-700">
             <input
               type="checkbox"
               checked={publishProfile}
               onChange={() => setPublishProfile(!publishProfile)}
-              className="text-[#007a6e] focus:ring-[#007a6e]"
+              className="text-[#007a6e] focus:ring-[#007a6e] w-[18px] h-[20px]"
             />
-            <span className="ml-2">Automatically publish profile on start date</span>
+
+            <span className="ml-2 text-md">
+              Automatically publish profile on start date
+            </span>
           </label>
-          <label className="flex items-center text-sm text-gray-400 cursor-not-allowed">
-            <input type="checkbox" checked={inviteUser} disabled className="text-[#007a6e]" />
-            <span className="ml-2">Automatically Invite for basic access upon publishing</span>
+          <label className="flex items-center text-md text-gray-400 cursor-not-allowed">
+            <input
+              type="checkbox"
+              checked={inviteUser}
+              disabled
+              className="text-[#007a6e] w-[18px] h-[20px]"
+            />
+            <span className="ml-2 text-md">
+              Automatically Invite for basic access upon publishing
+            </span>
           </label>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-4 pt-4">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded border border-gray-300 text-gray-600 hover:bg-gray-100"
+            className="px-5 py-[6px] text-md rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
           >
             Cancel
           </button>
@@ -122,8 +144,8 @@ const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {
             onClick={handleSubmit}
             isLoading={isSubmitting && submittingAction === "start"}
             disabled={isSubmitting}
-            className="h-[38px] px-[20px] w-[180px] disabled:opacity-50"
-            labelClassName="text-sm"
+            className="h-[40px] px-[24px] w-[200px] disabled:opacity-50"
+            labelClassName="text-md"
           />
         </div>
       </div>
