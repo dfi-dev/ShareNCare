@@ -12,7 +12,7 @@ const JobsCard = () => {
   const [menuIndex, setMenuIndex] = useState(null);
 
   return (
-    <div className="bg-white rounded-2xl shadow overflow-hidden">
+    <div className="bg-white rounded-2xl shadow">
       <div className="flex justify-between items-center px-6 py-4 border-b">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#007a6e] rounded-full flex items-center justify-center text-white">
