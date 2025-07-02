@@ -14,10 +14,11 @@ import CandidateProfile from './Dashboard/Pages/Candidates/CandidateProfile';
 import JobPreview from './Dashboard/Pages/Jobs/JobPreview';
 import ProfilePage from './Dashboard/Pages/ProfilePage';
 import SettingsLayout from './Dashboard/Pages/SettingsLayout';
-import {CalendarView} from './Dashboard/Pages/Time-Off/CalenderView';
+import { CalendarView } from './Dashboard/Pages/Time-Off/CalenderView';
 // import TimeOffRequestModal from './Dashboard/Pages/Attendence/TimeOffRequestModal';
 import UpcomingTimeOff from './Dashboard/Pages/Attendence/UpcomingTimeOff';
 import CandidateForm from './Test/CandidateForm';
+import TestLogin from './Pages/TestLogin';
 
 function App() {
   return (
@@ -25,9 +26,10 @@ function App() {
       <ScrollToTop />
       <Routes>
 
+
         {/* Top-level flat routes (no layout) */}
         <Route path='/' element={<Dashboard />} />
-
+        <Route path='/test-login' element={<TestLogin />} />
         {/* Profile & Settings */}
         <Route path='/calender' element={<CandidateForm />} />
         <Route path='/dashboard/profile' element={<ProfilePage />} />
