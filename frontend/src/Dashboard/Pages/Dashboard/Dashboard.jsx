@@ -20,16 +20,28 @@ export default function Dashboard() {
         {/* LEFT SIDE */}
         <div className="space-y-6">
           <CalendarCard />
+<<<<<<< HEAD
           {/* <JobsCard />
           <OnboardNewHiresCard />
           <TimeOffBalancesCard /> */}
+=======
+          <JobsCard />
+          <OnboardNewHiresCard />
+          <TimeOffBalancesCard />
+>>>>>>> 9e9fcaa062518daadaa38db7be9f98d54d6e7709
         </div>
 
         {/* RIGHT SIDE */}
         <div className="space-y-6">
+<<<<<<< HEAD
           {/* <ProfileCard /> */}
           {/* <NotificationsCard />
           <UpcomingTimeOffCard /> */}
+=======
+          <ProfileCard />
+          <NotificationsCard />
+          <UpcomingTimeOffCard />
+>>>>>>> 9e9fcaa062518daadaa38db7be9f98d54d6e7709
         </div>
       </div>
     </div>
