@@ -98,7 +98,6 @@ export default function TimeOffRequestReviewModal({ leave, onClose }) {
                 </div>
 
                 {/* Footer */}
-                {/* Footer */}
                 <div className="border-t border-gray-200 p-4 flex justify-end gap-3 bg-white z-10">
                     <button
                         onClick={onClose}

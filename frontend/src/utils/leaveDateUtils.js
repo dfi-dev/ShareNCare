@@ -29,6 +29,18 @@ export const formatDate = (date) => {
   }); // Example: 28 Jun 2025
 };
 
+export const formatFullDate = (date) => {
+  if (!date) return "";
+  return new Date(date)
+    .toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+    .replace(/,/g, "");
+}; // Example: Saturday 28 Jun 2025
+
 export const getLeaveMonthDates = (date) => {
   const year = date.getFullYear();
   const month = date.getMonth();

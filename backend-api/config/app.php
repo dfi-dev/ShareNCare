@@ -104,7 +104,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This locale will be used by the Faker PHP library when generating fake
-    | data for your database seeds. For sharencare, this will be used to get
+    | data for your database seeds. For example, this will be used to get
     | localized telephone numbers, street address information and more.
     |
     */
@@ -183,7 +183,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        // 'sharencare' => App\Facades\sharencare::class,
+        // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
 ];

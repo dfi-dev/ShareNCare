@@ -55,9 +55,9 @@ export const validateJobInfo = (job) => {
     errors.startDate = "Start date is required";
   }
 
-  if (!job.managerId) {
-    errors.manager = "Manager is required"; // ✅ use managerId
-  }
+  // if (!job.managerId) {
+  //   errors.manager = "Manager is required"; // ✅ use managerId
+  // }
 
   if (!job.employmentType) {
     errors.employmentType = "Employment type is required";

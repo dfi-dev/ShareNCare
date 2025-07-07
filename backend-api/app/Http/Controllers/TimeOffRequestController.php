@@ -6,6 +6,8 @@ use App\Helpers\TimeOffHelper;
 use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
 use App\Models\TimeOffRequest;
+use App\Models\User;
+use App\Notifications\TimeOffRequested;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -98,6 +100,13 @@ class TimeOffRequestController extends Controller
             'updated_by' => $employeeId,
             'status' => 'pending',
         ]);
+
+        // Send notification to manager's user account
+        $managerUser = User::where('employee_id', $managerId)->first();
+        if ($managerUser) {
+            $managerUser->notify(new TimeOffRequested($requestModel));
+        }
+
 
         return response()->json([
             'success' => true,
@@ -296,7 +305,7 @@ class TimeOffRequestController extends Controller
                     'id' => $req->id,
                     'date' => Carbon::parse($req->start_date)->format('d F Y'),
                     'title' => $req->timeOffType->name,
-                    'days' => $req->total_days . ' day' . ($req->total_days > 1 ? 's' : ''),
+                    'days' => (int) $req->total_days . ' day' . ($req->total_days > 1 ? 's' : ''),
                     'status' => ucfirst($req->status),
                     'note' => $req->note,
                     'modifiedDate' => Carbon::parse($req->updated_at)->format('d F Y'),
