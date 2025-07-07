@@ -34,7 +34,7 @@ export default function Dashboard() {
             } catch (error) {
                 console.error("Failed to fetch notifications", error);
             } finally {
-                setIsLoading(false); // 👈 Done loading
+                setIsLoading(false); 
             }
         };
 
