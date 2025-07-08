@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { Suspense } from 'react';
 import './App.css';
-import Dashboard from './Dashboard/Pages/Dashboard/Dashboard';
+import Dashboard from './Dashboard/Pages/Dashboard';
 import ScrollToTop from './Components/ScrollToTop';
 import Jobs from './Dashboard/Pages/Jobs/Jobs';
 import Employee from './Dashboard/Pages/Employee/Employee';
@@ -19,6 +19,7 @@ import { CalendarView } from './Dashboard/Pages/Time-Off/CalenderView';
 import UpcomingTimeOff from './Dashboard/Pages/Attendence/UpcomingTimeOff';
 import CandidateForm from './Test/CandidateForm';
 import TestLogin from './Pages/TestLogin';
+import Login from './Dashboard/Pages/Login';
 
 function App() {
   return (
@@ -28,8 +29,8 @@ function App() {
 
 
         {/* Top-level flat routes (no layout) */}
-        <Route path='/' element={<Dashboard />} />
-        <Route path='/test-login' element={<TestLogin />} />
+        <Route path='/' element={<Login />} />
+        <Route path='/dashboard' element={<Dashboard />} />
         {/* Profile & Settings */}
         <Route path='/calender' element={<CandidateForm />} />
         <Route path='/dashboard/profile' element={<ProfilePage />} />

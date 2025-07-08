@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import signup_bg from '../../assets/signup-bg.png'
 import white_tick from '../../assets/white-tick.png'
 // import icon from '../../assets/Icon.png'
 import icon from '../../assets/logo.png'
@@ -88,7 +87,7 @@ const Login = () => {
         }
         setLoading(false);
         setSuccess(true);
-        navigate("/dashboard/jobs");
+        navigate("/dashboard");
       } else {
         setLoading(false);
         setSuccess(false);
@@ -118,7 +117,7 @@ const Login = () => {
     'Find and attract candidates.'
   ]
   return (
-    <div className='w-[100vw] relative h-[100vh] flex items-center justify-center bg-contain bg-top' style={{ backgroundImage: `url(${signup_bg})` }}>
+    <div className='w-[100vw] relative h-[100vh] flex items-center justify-center bg-contain bg-top'>
       <div className='sm:block hidden'>
         <Link to="/">
           <div className='h-10 w-10 flex hover:scale-105 hover:shadow-sm hover:shadow-gray-500 items-center justify-center bg-gray-200 rounded-full cursor-pointer absolute [@media(max-width:500px)]:top-5 top-10 [@media(max-width:500px)]:left-5 left-10' title={"Home Page"}>

@@ -1,6 +1,5 @@
 import React from "react";
 import { CalendarDays } from "lucide-react";
-import IconWrapper from "./IconWrapper";
 
 const CalendarCard = () => {
   const tabs = [

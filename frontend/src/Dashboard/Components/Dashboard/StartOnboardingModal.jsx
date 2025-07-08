@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import ActionButton from "../ActionButton";
+import ActionButton from "../../Components/ActionButton";
 import ModalWrapper from "../ModalWrapper";
 
 const StartOnboardingModal = ({ candidateName, onCancel, onStart }) => {

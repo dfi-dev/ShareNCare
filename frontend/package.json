@@ -34,6 +34,7 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.4.0",
     "react-tooltip": "^5.28.1",
+    "tailwind-scrollbar": "^2.0.1",
     "yup": "^1.6.1"
   },
   "devDependencies": {
