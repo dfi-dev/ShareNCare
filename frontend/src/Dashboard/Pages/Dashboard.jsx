@@ -102,20 +102,20 @@ export default function Dashboard() {
                 {/* LEFT SIDE */}
                 <div className="space-y-6">
                     <CalendarCard />
-                    <JobsCard />
+                    {/* <JobsCard />
                     <OnboardNewHiresCard />
-                    <TimeOffBalancesCard />
+                    <TimeOffBalancesCard /> */}
                 </div>
 
                 {/* RIGHT SIDE */}
                 <div className="space-y-6">
-                    <ProfileCard />
+                    {/* <ProfileCard />
                     <NotificationsCard
                         notifications={notifications.slice(0, 5)}
                         onNotificationClick={handleNotificationClick}
                         isLoading={isLoading}
                     />
-                    <UpcomingTimeOffCard />
+                    <UpcomingTimeOffCard /> */}
                 </div>
             </div>
 

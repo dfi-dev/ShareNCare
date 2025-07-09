@@ -18,8 +18,8 @@ import { CalendarView } from './Dashboard/Pages/Time-Off/CalenderView';
 // import TimeOffRequestModal from './Dashboard/Pages/Attendence/TimeOffRequestModal';
 import UpcomingTimeOff from './Dashboard/Pages/Attendence/UpcomingTimeOff';
 import CandidateForm from './Test/CandidateForm';
-import TestLogin from './Pages/TestLogin';
 import Login from './Dashboard/Pages/Login';
+import Signup from './Dashboard/Pages/Signup';
 
 function App() {
   return (
@@ -30,6 +30,7 @@ function App() {
 
         {/* Top-level flat routes (no layout) */}
         <Route path='/' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
         <Route path='/dashboard' element={<Dashboard />} />
         {/* Profile & Settings */}
         <Route path='/calender' element={<CandidateForm />} />

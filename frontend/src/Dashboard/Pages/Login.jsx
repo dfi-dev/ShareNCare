@@ -139,7 +139,7 @@ const Login = () => {
         <div className='max-w-[1700px] grid [@media(min-width:1000px)]:grid-cols-2 grid-cols-1 gap-5 items-center text-white'>
           <div className='xl:pl-40 md:pl-10 flex-col gap-6 [@media(min-width:1000px)]:flex hidden'>
             {/* <img src={icon} className='w-16 h-16' /> */}
-            <img src={icon} className='w-fit h-16' />
+            <img src={icon} className='w-20 h-8' />
             <p className='text-3xl font-semibold'>Big ideas. Amazing talent.The recruiting software that brings them together.</p>
             <div className='flex flex-col gap-4'>
               {

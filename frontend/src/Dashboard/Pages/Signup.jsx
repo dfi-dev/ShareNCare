@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import white_tick from '../../assets/white-tick.png';
 import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
@@ -140,9 +139,7 @@ const Signup = () => {
 
   return (
     <div
-      className='relative flex items-center justify-center bg-contain bg-top'
-      style={{ backgroundImage: `url(${signup_bg})` }}
-    >
+      className='relative flex items-center justify-center bg-contain bg-top'>
       <div className='sm:block hidden'>
         <Link to="/">
           <div className='h-10 w-10 flex hover:scale-105 hover:shadow-sm hover:shadow-gray-500 items-center justify-center bg-gray-200 rounded-full cursor-pointer absolute [@media(max-width:500px)]:top-5 top-10 [@media(max-width:500px)]:left-5 left-10' title={"Home Page"}>
@@ -166,7 +163,6 @@ const Signup = () => {
           <div className='flex flex-col gap-4'>
             {points.map((item) => (
               <div key={item} className='flex items-center gap-3'>
-                <img src={white_tick} className='w-6 h-6' />
                 <p className='text-lg'>{item}</p>
               </div>
             ))}
