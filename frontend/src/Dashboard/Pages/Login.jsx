@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import signup_bg from '../../assets/signup-bg.png'
 import white_tick from '../../assets/white-tick.png'
 // import icon from '../../assets/Icon.png'
 import icon from '../../assets/logo.png'
@@ -61,7 +62,7 @@ const Login = () => {
   const postLogin = async (values) => {
     localStorage.removeItem('isManager');
     try {
-      setLoading(true)
+      setLoading(true);
       const payload = {
         email: values.email,
         password: values.password,
@@ -72,7 +73,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log("response ", response)
+
       if (response.status === 200) {
         const { access_token, user, employee_id, is_manager } = response.data;
 
@@ -81,13 +82,20 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('employeeId', JSON.stringify(employee_id));
 
-        // ✅ Only set if key exists
         if (typeof is_manager !== 'undefined') {
           localStorage.setItem('isManager', JSON.stringify(is_manager));
         }
+
         setLoading(false);
         setSuccess(true);
-        navigate("/dashboard");
+
+        // ✅ Redirect based on role
+        if (user.role === 5) {
+          navigate("/dashboard"); // for employee
+        } else {
+          navigate("/dashboard/jobs"); // for admin, HR, recruiter etc.
+        }
+
       } else {
         setLoading(false);
         setSuccess(false);
@@ -99,14 +107,13 @@ const Login = () => {
         error?.response?.data?.error ||
         "Something went wrong",
         "error"
-      )
+      );
 
-      setLoading(false)
-      setSuccess(false)
-    } finally {
-      console.log("finally run")
+      setLoading(false);
+      setSuccess(false);
     }
-  }
+  };
+
 
 
 
@@ -117,7 +124,7 @@ const Login = () => {
     'Find and attract candidates.'
   ]
   return (
-    <div className='w-[100vw] relative h-[100vh] flex items-center justify-center bg-contain bg-top'>
+    <div className='w-[100vw] relative h-[100vh] flex items-center justify-center bg-contain bg-top' style={{ backgroundImage: `url(${signup_bg})` }}>
       <div className='sm:block hidden'>
         <Link to="/">
           <div className='h-10 w-10 flex hover:scale-105 hover:shadow-sm hover:shadow-gray-500 items-center justify-center bg-gray-200 rounded-full cursor-pointer absolute [@media(max-width:500px)]:top-5 top-10 [@media(max-width:500px)]:left-5 left-10' title={"Home Page"}>
@@ -139,7 +146,7 @@ const Login = () => {
         <div className='max-w-[1700px] grid [@media(min-width:1000px)]:grid-cols-2 grid-cols-1 gap-5 items-center text-white'>
           <div className='xl:pl-40 md:pl-10 flex-col gap-6 [@media(min-width:1000px)]:flex hidden'>
             {/* <img src={icon} className='w-16 h-16' /> */}
-            <img src={icon} className='w-20 h-8' />
+            <img src={icon} className='w-fit h-16' />
             <p className='text-3xl font-semibold'>Big ideas. Amazing talent.The recruiting software that brings them together.</p>
             <div className='flex flex-col gap-4'>
               {

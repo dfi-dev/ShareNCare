@@ -3,6 +3,7 @@ import { Plus, X } from "lucide-react";
 
 const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
   const [todoInputs, setTodoInputs] = useState([""]);
+  const [error, setError] = useState("");
 
   const handleInputChange = (index, value) => {
     const updated = [...todoInputs];
@@ -15,16 +16,21 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    const trimmed = todoInputs.map((t) => t.trim()).filter((t) => t);
-    if (trimmed.length > 0) {
-      onSubmit(trimmed);
+    const trimmed = todoInputs.map((t) => t.trim());
+    if (trimmed.some((t) => t === "")) {
+      setError("All fields must be filled out.");
+      return;
     }
+
+    setError("");
+    onSubmit(trimmed);
     setTodoInputs([""]);
     onClose();
   };
 
   const handleCancel = () => {
     setTodoInputs([""]);
+    setError("");
     onClose();
   };
 
@@ -33,7 +39,6 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl w-full max-w-xl p-6 relative shadow-xl">
-        {/* Close Button */}
         <button
           className="absolute top-4 right-4 text-black hover:opacity-70"
           onClick={handleCancel}
@@ -41,10 +46,10 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
           <X size={22} />
         </button>
 
-        {/* Title */}
         <h2 className="text-xl font-semibold mb-4">To Do List</h2>
 
-        {/* Input List */}
+        {error && <p className="text-sm text-red-500 mb-2">{error}</p>}
+
         <div className="space-y-5 max-h-[38vh] overflow-y-auto pr-2 scrollbar-enhanced">
           {todoInputs.map((value, index) => (
             <div key={index}>
@@ -62,9 +67,7 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
           ))}
         </div>
 
-        {/* Footer with Add More + Actions */}
         <div className="flex items-center justify-between mt-6">
-          {/* Add More on Left */}
           <button
             type="button"
             onClick={handleAddMore}
@@ -76,7 +79,6 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
             <span className="hover:underline text-sm">Add More</span>
           </button>
 
-          {/* Action Buttons on Right */}
           <div className="flex gap-4">
             <button
               onClick={handleCancel}
@@ -92,7 +94,6 @@ const CreateTodoModal = ({ isOpen, onClose, onSubmit }) => {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

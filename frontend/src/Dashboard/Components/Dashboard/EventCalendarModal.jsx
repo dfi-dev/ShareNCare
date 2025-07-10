@@ -12,6 +12,7 @@ import {
   isSameDay,
 } from "date-fns";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import axios from "axios";
 
 const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -22,6 +23,7 @@ const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
   const isSelectableDate = selectedDate.getDay() !== 0; // Sunday = 0
   const [hasSelectedDate, setHasSelectedDate] = useState(false);
   const [showCustomTimeInput, setShowCustomTimeInput] = useState(false);
+  const [error, setError] = useState("");
 
 
   const renderHeader = () => (
@@ -128,27 +130,54 @@ const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
     return <div className="space-y-2">{rows}</div>;
   };
 
-  const handleCreateEvent = () => {
-    const payload = {
-      date: selectedDate,
-      title,
-      description,
-      time,
-    };
-    console.log("Event Created:", payload);
-    setTitle("");
-    setDescription("");
-    setTime("");
-    if (onSubmit) {
-      onSubmit({
-        time,
-        title,
-        description,
-        date: selectedDate,
-      });
+  const handleCreateEvent = async () => {
+    if (!title.trim()) {
+      setError("Event title is required.");
+      return;
     }
-    handleClose();
+    if (!hasSelectedDate || selectedDate.getDay() === 0) {
+      setError("Please select a valid date (not Sunday).");
+      return;
+    }
+    if (!time) {
+      setError("Please select a time.");
+      return;
+    }
+
+    setError("");
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/events`,
+        {
+          title,
+          description,
+          date: format(selectedDate, "yyyy-MM-dd"),
+          time,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (onSubmit) {
+        onSubmit({
+          ...res.data,
+          date: new Date(`${res.data.date}T${res.data.time}`),
+        });
+      }
+
+      handleClose();
+    } catch (err) {
+      console.error("Failed to create event", err);
+      alert("Something went wrong while creating the event.");
+    }
   };
+
 
   if (!isOpen) return null;
 
@@ -170,7 +199,9 @@ const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
           {/* Event Form */}
           <div className="w-1/2 pl-8 border-l border-dashed border-gray-300 flex flex-col relative">
             <div className="overflow-y-auto pr-2 scrollbar-enhanced pb-10">
-
+              {error && (
+                <p className="text-sm text-red-500  pb-2">{error}</p>
+              )}
               <h3 className="text-sm font-medium mb-4 text-gray-700">
                 Add Event - {format(selectedDate, "d MMMM yyyy")}
               </h3>
@@ -253,6 +284,7 @@ const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
 
             <div className="absolute bottom-0 left-0 w-full bg-white pt-3 pb-4 pr-2">
+
               <div className="flex justify-center">
                 <button
                   onClick={handleCreateEvent}

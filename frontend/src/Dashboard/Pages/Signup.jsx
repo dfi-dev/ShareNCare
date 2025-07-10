@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import signup_bg from '../../assets/signup-bg.png';
+import white_tick from '../../assets/white-tick.png';
+import spinner from '../../assets/white-spinner.svg'
+// import icon from '../../assets/Icon.png';
+import icon from '../../assets/logo.png';
 import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
@@ -139,7 +144,9 @@ const Signup = () => {
 
   return (
     <div
-      className='relative flex items-center justify-center bg-contain bg-top'>
+      className='relative flex items-center justify-center bg-contain bg-top'
+      style={{ backgroundImage: `url(${signup_bg})` }}
+    >
       <div className='sm:block hidden'>
         <Link to="/">
           <div className='h-10 w-10 flex hover:scale-105 hover:shadow-sm hover:shadow-gray-500 items-center justify-center bg-gray-200 rounded-full cursor-pointer absolute [@media(max-width:500px)]:top-5 top-10 [@media(max-width:500px)]:left-5 left-10' title={"Home Page"}>
@@ -159,10 +166,12 @@ const Signup = () => {
       <div className='max-w-[1700px] grid [@media(min-width:1000px)]:grid-cols-2 grid-cols-1 gap-5 items-center text-white'>
         <div className='xl:pl-40 md:pl-10 flex-col gap-6 [@media(min-width:1000px)]:flex hidden'>
           {/* <img src={icon} className='w-16 h-16' /> */}
+          <img src={icon} className='w-fit h-16' />
           <p className='text-3xl font-semibold'>Big ideas. Amazing talent.The recruiting software that brings them together.</p>
           <div className='flex flex-col gap-4'>
             {points.map((item) => (
               <div key={item} className='flex items-center gap-3'>
+                <img src={white_tick} className='w-6 h-6' />
                 <p className='text-lg'>{item}</p>
               </div>
             ))}

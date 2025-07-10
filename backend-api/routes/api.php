@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\TimeOffRequestController;
-use App\Http\Controllers\TodoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +15,7 @@ use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\CompanyProfileController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationStatsController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SimpleMailController;
+use App\Http\Controllers\TodoController;
 use App\Http\Controllers\UserProfileController;
 
 /*
@@ -152,6 +152,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             Route::get('/all', 'getAllTimeOff');
             // Get leave balance for the logged-in employee
             Route::get('/leave-balance', 'getLeaveBalance');
+            // Update specific leave balance
+            Route::put('/leave-balance/{id}', 'updateLeaveBalanceById');
             // Get requests by manager
             Route::get('/manager', 'getByManager');
             // Get requests by employee
@@ -186,7 +188,6 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             Route::patch('/{id}', 'update');  // PATCH /api/v.1/todos/{id}
             Route::delete('/{id}', 'destroy'); // DELETE /api/v.1/todos/{id}
         });
-
 
 
 

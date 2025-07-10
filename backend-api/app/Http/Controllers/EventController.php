@@ -13,13 +13,20 @@ class EventController extends Controller
     {
         $employeeId = Auth::user()->employee_id;
 
-        // Fetch manager and subordinates' events
-        $events = Event::whereHas('employee.jobDetail', function ($q) use ($employeeId) {
-            $q->where('manager_id', $employeeId)->orWhere('employee_id', $employeeId);
+        // Get manager_id of the logged-in employee (null if not assigned)
+        $managerId = optional(Auth::user()->employee->jobDetail)->manager_id;
+
+        $events = Event::where(function ($query) use ($employeeId, $managerId) {
+            $query->where('manager_id', $employeeId); // Manager sees their own events
+
+            if ($managerId) {
+                $query->orWhere('manager_id', $managerId); // Team members see their manager's events
+            }
         })->get();
 
         return response()->json($events);
     }
+
 
     // Store event
     public function store(Request $request)
@@ -32,7 +39,7 @@ class EventController extends Controller
         ]);
 
         $event = Event::create([
-            'employee_id' => Auth::user()->employee_id,
+            'manager_id' => Auth::user()->employee_id, // ✅ correct field name
             'title' => $request->title,
             'description' => $request->description,
             'date' => $request->date,
