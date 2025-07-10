@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\TimeOffRequestController;
+use App\Http\Controllers\TodoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -169,6 +171,22 @@ Route::group(['middleware' => 'api', 'prefix' => 'v.1'], function ($router) {
             Route::get('/unread', [NotificationController::class, 'unread']);
             Route::post('/mark-as-read', [NotificationController::class, 'markAsRead']);
         });
+
+        // 🗓️ Events
+        Route::prefix('events')->controller(EventController::class)->group(function () {
+            Route::get('/', 'index');     // GET /api/v.1/events
+            Route::post('/', 'store');    // POST /api/v.1/events
+        });
+
+
+        // ✅ Todos
+        Route::prefix('todos')->controller(TodoController::class)->group(function () {
+            Route::get('/', 'index');         // GET /api/v.1/todos
+            Route::post('/', 'store');        // POST /api/v.1/todos
+            Route::patch('/{id}', 'update');  // PATCH /api/v.1/todos/{id}
+            Route::delete('/{id}', 'destroy'); // DELETE /api/v.1/todos/{id}
+        });
+
 
 
 

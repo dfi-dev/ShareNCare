@@ -25,7 +25,7 @@ class TodoController extends Controller
         $todo = Todo::create([
             'employee_id' => Auth::user()->employee_id,
             'title' => $request->title,
-            'done' => false,
+            'is_done' => false,
         ]);
 
         return response()->json($todo, 201);
@@ -35,7 +35,7 @@ class TodoController extends Controller
     public function update(Request $request, $id)
     {
         $todo = Todo::where('employee_id', Auth::user()->employee_id)->findOrFail($id);
-        $todo->done = !$todo->done;
+        $todo->is_done = !$todo->is_done;
         $todo->save();
 
         return response()->json($todo);

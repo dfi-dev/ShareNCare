@@ -1,62 +1,90 @@
-import React, { useState } from "react";
-import { CalendarClock, CalendarDays } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { CalendarDays } from "lucide-react";
+import axios from "axios";
 import CreateTodoModal from "./CreateTodoModal";
 import EventCalendarModal from "./EventCalendarModal";
-import { format } from "date-fns";
-
 
 const CalendarCard = () => {
   const [activeTab, setActiveTab] = useState("Events");
   const [showTodoModal, setShowTodoModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [todoList, setTodoList] = useState([]);
+  const [loadingTodos, setLoadingTodos] = useState(false);
 
-  const [events, setEvents] = useState([
-    {
-      time: "11:00 AM",
-      title: "Induction Meeting",
-      description: "Welcome session for new joiners.",
-      date: new Date("2025-01-23T11:00:00"),
-    },
-    {
-      time: "12:00 PM",
-      title: "Interview Meeting with Candidate",
-      description: "Tech round with senior engineer.",
-      date: new Date("2025-01-23T12:00:00"),
-    },
-    {
-      time: "01:30 PM",
-      title: "Follow-up Call",
-      description: "Client discussion and feedback review.",
-      date: new Date("2025-01-23T13:30:00"),
-    },
-  ]);
+  const meetings = [
+    { time: "11:00 AM", title: "Induction Meeting" },
+    { time: "12:00 AM", title: "Interview Meeting with Candidate" },
+    { time: "01:30 PM", title: "Follow-up Call" },
+  ];
 
-  const [todoList, setTodoList] = useState([
-    { title: "Prepare Report", done: false },
-    { title: "Send Emails to Clients", done: false },
-    { title: "Prepare Report", done: false },
-    { title: "Send Emails to Clients", done: false },
-    { title: "Prepare Report", done: false },
-    { title: "Send Emails to Clients", done: false },
-    { title: "Prepare Report", done: false },
-    { title: "Send Emails to Clients", done: false },
-    { title: "Prepare Report", done: false },
-    { title: "Send Emails to Clients", done: false },
-  ]);
+  const token = localStorage.getItem("access_token");
 
-
-
-  const handleCheckboxChange = (index) => {
-    const updated = [...todoList];
-    updated[index].done = !updated[index].done;
-    setTodoList(updated);
+  // 🔄 Load To-Do items from backend
+  const fetchTodos = async () => {
+    try {
+      setLoadingTodos(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/todos`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTodoList(response.data);
+    } catch (error) {
+      console.error("Failed to fetch todos", error);
+    } finally {
+      setLoadingTodos(false);
+    }
   };
 
-  const handleAddTodos = (newTodos) => {
-    setTodoList([
-      ...todoList,
-      ...newTodos.map((t) => ({ title: t, done: false })),
-    ]);
+  useEffect(() => {
+    if (activeTab === "To Do") {
+      fetchTodos();
+    }
+  }, [activeTab]);
+
+  // ✅ Add new todos using backend
+  const handleAddTodos = async (newTitles) => {
+    try {
+      const requests = newTitles.map((title) =>
+        axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/todos`,
+          { title },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+      );
+      const responses = await Promise.all(requests);
+      const newTodos = responses.map((res) => res.data);
+      setTodoList((prev) => [...prev, ...newTodos]);
+    } catch (error) {
+      console.error("Failed to create todos", error);
+    }
+  };
+
+  // ✅ Toggle done status
+  const handleCheckboxChange = async (id, index) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/todos/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updated = [...todoList];
+      updated[index].done = !updated[index].done;
+      setTodoList(updated);
+    } catch (error) {
+      console.error("Failed to update todo", error);
+    }
   };
 
   return (
@@ -76,10 +104,11 @@ const CalendarCard = () => {
             <button
               key={label}
               onClick={() => setActiveTab(label)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${activeTab === label
-                ? "bg-[#007a6e] text-white"
-                : "bg-[#F3F7F8] text-[#757575]"
-                }`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                activeTab === label
+                  ? "bg-[#007a6e] text-white"
+                  : "bg-[#F3F7F8] text-[#757575]"
+              }`}
             >
               {label}
             </button>
@@ -89,77 +118,58 @@ const CalendarCard = () => {
 
       {/* Content */}
       <div className="p-6 space-y-4">
-        {/* Scrollable To-Do or Event List */}
         <div className="space-y-4 max-h-52 overflow-y-auto pr-2 scrollbar-enhanced">
           {activeTab === "Events" &&
-            events.map((item, idx) => (
-              <div key={idx}>
-                <div className="flex gap-4 items-center px-2 py-2">
-                  {/* Icon + Date/Time */}
-                  <div className="flex items-center gap-2 w-40">
-                    <div className="bg-[#007a6e] text-white p-1 rounded-full">
-                      <CalendarClock className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">
-                        {format(new Date(item.date), "EEE, d MMM")}
-                      </p>
-                      <p className="text-xs text-gray-500">{item.time}</p>
-                    </div>
-                  </div>
-
-                  {/* Event Details */}
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-800 leading-tight">
-                      {item.title}
-                    </p>
-                    {item.description && (
-                      <p className="text-xs text-gray-500">{item.description}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Separator */}
-                {idx < events.length - 1 && (
-                  <div className="border-t border-gray-200 mx-2"></div>
-                )}
+            meetings.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-6">
+                <p className="text-sm font-semibold w-24 text-right">
+                  {item.time}
+                </p>
+                <p className="text-sm text-gray-500">{item.title}</p>
               </div>
             ))}
 
           {activeTab === "To Do" && (
             <>
-              {todoList.map((item, idx) => (
-                <label
-                  key={idx}
-                  className="flex items-center gap-3 cursor-pointer px-2"
-                >
-                  <input
-                    type="checkbox"
-                    checked={item.done}
-                    onChange={() => handleCheckboxChange(idx)}
-                    className="accent-[#007a6e] w-4 h-4"
-                  />
-                  <span
-                    className={`text-sm ${item.done
-                      ? "line-through text-gray-400"
-                      : "text-gray-700"
-                      }`}
-                  >
-                    {item.title}
-                  </span>
-                </label>
-              ))}
+              {loadingTodos ? (
+                <p className="text-sm text-gray-400 text-center">Loading...</p>
+              ) : (
+                <>
+                  {todoList.map((item, idx) => (
+                    <label
+                      key={item.id}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={item.done}
+                        onChange={() => handleCheckboxChange(item.id, idx)}
+                        className="accent-[#007a6e] w-4 h-4"
+                      />
+                      <span
+                        className={`text-sm ${
+                          item.done
+                            ? "line-through text-gray-400"
+                            : "text-gray-700"
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                    </label>
+                  ))}
 
-              {todoList.length === 0 && (
-                <p className="text-sm text-gray-400 text-center">
-                  No tasks available.
-                </p>
+                  {todoList.length === 0 && (
+                    <p className="text-sm text-gray-400 text-center">
+                      No tasks available.
+                    </p>
+                  )}
+                </>
               )}
             </>
           )}
         </div>
 
-        {/* Sticky Button Below Scroll */}
+        {/* Create New Button */}
         {activeTab === "To Do" && (
           <div className="sticky bottom-0 pt-2 bg-white">
             <button
@@ -193,9 +203,6 @@ const CalendarCard = () => {
       <EventCalendarModal
         isOpen={showEventModal}
         onClose={() => setShowEventModal(false)}
-        onSubmit={(event) =>
-          setEvents((prev) => [...prev, event])
-        }
       />
     </div>
   );
