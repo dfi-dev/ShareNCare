@@ -99,7 +99,6 @@ const JobSection = forwardRef(({ data, onChange, errors }, ref) => {
                     <CustomSelect
                         label="Manager"
                         optionsList={employeeOptions}
-                        required
                         value={data.managerId || ""}
                         onChange={(val) => handleChange("managerId", val)}
                         error={errors.manager}

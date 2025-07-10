@@ -13,7 +13,7 @@ import {
 } from "date-fns";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-const EventCalendarModal = ({ isOpen, onClose }) => {
+const EventCalendarModal = ({ isOpen, onClose, onSubmit }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [time, setTime] = useState("");
@@ -139,6 +139,14 @@ const EventCalendarModal = ({ isOpen, onClose }) => {
     setTitle("");
     setDescription("");
     setTime("");
+    if (onSubmit) {
+      onSubmit({
+        time,
+        title,
+        description,
+        date: selectedDate,
+      });
+    }
     handleClose();
   };
 

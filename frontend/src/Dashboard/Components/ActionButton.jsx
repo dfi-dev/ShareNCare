@@ -12,7 +12,7 @@ export default function ActionButton({
     <button
       onClick={onClick}
       disabled={isLoading}
-      className={`relative flex items-center justify-center text-white rounded-md shadow-md disabled:opacity-70 transition-all duration-300 ${!hasBgColor ? defaultBg : ""} ${className}`}
+      className={`relative flex items-center justify-center text-white rounded-lg shadow-md disabled:opacity-70 transition-all duration-300 ${!hasBgColor ? defaultBg : ""} ${className}`}
     >
       <div className="flex items-center justify-center space-x-1">
         {isLoading ? (

@@ -36,7 +36,8 @@ export default function TimeOffApprovalStatusModal({ leave, onClose }) {
                         {leave.status.charAt(0).toUpperCase() + leave.status.slice(1)} Time-Off Request
                     </h2>
                     <p className="text-gray-500 text-sm">
-                        {employee?.name} ({employee?.role})
+                        {employee?.name}
+                        {employee?.role && ` (${employee.role})`}
                         {requestedOn && ` · Requested on ${formatDate(requestedOn)}`}
                     </p>
                 </div>

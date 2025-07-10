@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to sharencare</title>
+  <title>Welcome to Bipani</title>
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -93,13 +93,13 @@
   <div class="email-container">
     <!-- Header -->
     <div class="header">
-      <img src="https://res.cloudinary.com/dwi5dlj62/image/upload/v1747243088/logo-bxL4WHcf_utrjxi.png" alt="sharencare Logo" />
+      <img src="https://res.cloudinary.com/dwi5dlj62/image/upload/v1747243088/logo-bxL4WHcf_utrjxi.png" alt="Bipani Logo" />
     </div>
 
     <!-- Main Content -->
     <div class="content">
       <img class="main-icon" src="https://cdn-icons-png.flaticon.com/512/10373/10373129.png" alt="Envelope Icon" />
-      <h2>Welcome to sharencare, {{ $data['company_name'] }}!</h2>
+      <h2>Welcome to Bipani, {{ $data['company_name'] }}!</h2>
       <div class="welcome-text">
         We're excited to have your company join our platform.
       </div>
@@ -108,7 +108,7 @@
       <p>Your company profile has been successfully created. Below are your login credentials:</p>
 
       <div class="credentials">
-        🌐 <strong>Website:</strong> <a href="https://sharencare.co/login">https://sharencare.co/login</a><br/>
+        🌐 <strong>Website:</strong> <a href="https://bipani.co/login">https://bipani.co/login</a><br/>
         🏢 <strong>Company Name:</strong> {{ $data['company_name'] }}<br/>
         📧 <strong>Email:</strong> {{ $data['email'] }}<br/>
         🔐 <strong>Password:</strong> {{ $data['password'] }}<br/>
@@ -117,11 +117,11 @@
 
       <p>Please log in using the above credentials and change your password immediately for security.</p>
 
-      <p>If you have any questions or need assistance, reach out to us at <a href="mailto:support@sharencare.co">support@sharencare.co</a>.</p>
+      <p>If you have any questions or need assistance, reach out to us at <a href="mailto:support@bipani.co">support@bipani.co</a>.</p>
 
       <p style="margin-top: 30px;">
         Warm regards,<br/>
-        Team sharencare
+        Team Bipani
       </p>
     </div>
 
@@ -133,7 +133,7 @@
         <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" /></a>
         <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" /></a>
       </div>
-      <p>©2025 www.sharencare.com. All Rights Reserved.</p>
+      <p>©2025 www.bipani.com. All Rights Reserved.</p>
       <a href="#" class="unsubscribe">Unsubscribe</a>
     </div>
   </div>
