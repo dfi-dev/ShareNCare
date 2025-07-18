@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\TimeOffHelper;
 use App\Models\Employee;
 use App\Models\EmployeeLeaveBalance;
-use App\Models\JobDetail;
 use App\Models\TimeOffRequest;
 use App\Models\User;
 use App\Notifications\TimeOffApproved;
@@ -448,7 +447,7 @@ class TimeOffRequestController extends Controller
             $managerId = $user->employee_id;
 
             // Check if this employee is a manager (has subordinates)
-            $isManager = JobDetail::where('manager_id', $managerId)->exists();
+            $isManager = \App\Models\JobDetail::where('manager_id', $managerId)->exists();
 
             if (!$isManager) {
                 return response()->json([
@@ -459,7 +458,7 @@ class TimeOffRequestController extends Controller
 
             // Allow if updating own or subordinate's balance
             $isSelf = $managerId == $targetEmployeeId;
-            $isSubordinate = JobDetail::where('manager_id', $managerId)
+            $isSubordinate = \App\Models\JobDetail::where('manager_id', $managerId)
                 ->where('employee_id', $targetEmployeeId)
                 ->exists();
 

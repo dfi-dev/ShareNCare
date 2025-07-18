@@ -1,0 +1,7 @@
+ToDo
+  Modified to do controller to create and return only todays todo
+  Modified ToDo model to automatically delete past todos
+  Modified Console/Kernal.php
+
+Events
+  Modified to do controller to create and return only present and future events
